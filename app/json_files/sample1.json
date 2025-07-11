@@ -1,0 +1,2780 @@
+{
+    "submission": [
+        {
+            "submission_title": "Macleod horse samples - FAANG example file",
+            "submission_description": "Example sample information using the FAANG metadata spec"
+        }
+    ],
+    "person": [
+        {
+            "person_last_name": "Harrison",
+            "person_initials": "P.W.",
+            "person_first_name": "Peter",
+            "person_email": "peter@ebi.ac.uk",
+            "person_role": "submitter"
+        }
+    ],
+    "organization": [
+        {
+            "organization_name": "EMBL-EBI",
+            "organization_address": "Wellcome Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom",
+            "organization_uri": "http://www.ebi.ac.uk/",
+            "organization_role": "curator"
+        }
+    ],
+    "organism": [
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adult female, 23.5 months of age, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "female",
+                "term": "PATO:0000383"
+            },
+            "birth_date": {
+                "value": "2009-04",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H1"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Foal, 9 days old, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "female",
+                "term": "PATO:0000383"
+            },
+            "birth_date": {
+                "value": "2014-07",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H2"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Whole embryo, 34 days gestational age, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "female",
+                "term": "PATO:0000383"
+            },
+            "birth_date": {
+                "value": "2016-01",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H3"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Endometrium (pregnant day 16)"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "female",
+                "term": "PATO:0000383"
+            },
+            "birth_date": {
+                "value": "2016-01",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H4"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Endometrium (pregnant day 50)"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "female",
+                "term": "PATO:0000383"
+            },
+            "birth_date": {
+                "value": "2016-01",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H5"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adult male, 4 years of age, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "male",
+                "term": "PATO:0000384"
+            },
+            "birth_date": {
+                "value": "2016-01",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H6"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adult"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "male",
+                "term": "PATO:0000384"
+            },
+            "birth_date": {
+                "value": "2014-07",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H7"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adult, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "male",
+                "term": "PATO:0000384"
+            },
+            "birth_date": {
+                "value": "2014-07",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H8"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Full term, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "female",
+                "term": "PATO:0000383"
+            },
+            "birth_date": {
+                "value": "2014-07",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H9"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adult"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "male",
+                "term": "PATO:0000384"
+            },
+            "birth_date": {
+                "value": "2014-07",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H10"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Foal"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "organism": {
+                "text": "Equus caballus",
+                "term": "NCBITaxon:9796"
+            },
+            "sex": {
+                "text": "male",
+                "term": "PATO:0000384"
+            },
+            "birth_date": {
+                "value": "2013-02",
+                "units": "YYYY-MM"
+            },
+            "breed": {
+                "text": "Thoroughbred",
+                "term": "LBO:0000910"
+            },
+            "health_status": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_H11"
+                }
+            }
+        }
+    ],
+    "specimen_from_organism": [
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adipose Tissue, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "adipose tissue",
+                "term": "UBERON:0001013"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S1"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adrenal Cortex, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "adrenal cortex",
+                "term": "UBERON:0001235"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S2"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adrenal Medulla, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "adrenal medulla",
+                "term": "UBERON:0001236"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S3"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Aorta, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "aorta",
+                "term": "UBERON:0000947"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S4"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Bladder, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "urinary bladder",
+                "term": "UBERON:0001255"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S5"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Bone, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "bone tissue",
+                "term": "UBERON:0002481"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S6"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Bone Marrow, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "bone marrow",
+                "term": "UBERON:0002371"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S7"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Cecum, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "caecum",
+                "term": "UBERON:0001153"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S8"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Cerebrum, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "telencephalon",
+                "term": "UBERON:0001893"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S9"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Cornea, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "cornea",
+                "term": "UBERON:0000964"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S10"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Hoof (germinal epithelium), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "sensitive lamina",
+                "term": "BTO:0003996"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S11"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Kidney, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "kidney",
+                "term": "UBERON:0002113"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S12"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Large Intestine, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "large intestine",
+                "term": "UBERON:0000059"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S13"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Liver, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "liver",
+                "term": "UBERON:0002107"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S14"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Lung, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "lung",
+                "term": "UBERON:0002048"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S15"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Lymph Node, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "lymph node",
+                "term": "UBERON:0000029"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S16"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Muscle (cardiac), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "cardiac muscle tissue",
+                "term": "UBERON:0001133"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S17"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Muscle (skeletal), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "skeletal muscle tissue",
+                "term": "UBERON:0001134"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S18"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Muscle (smooth), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "smooth muscle tissue",
+                "term": "UBERON:0001135"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S19"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Ovary, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "ovary",
+                "term": "UBERON:0000992"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S20"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Pituitary (anterior), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "adenohypophysis",
+                "term": "UBERON:0002196"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S21"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Pituitary (posterior), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "neurohypophysis",
+                "term": "UBERON:0002198"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S22"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Retina, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "retina",
+                "term": "UBERON:0000966"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S23"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Skin (full thickness), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "skin of body",
+                "term": "UBERON:0002097"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S24"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Spinal Cord, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "spinal cord",
+                "term": "UBERON:0002240"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S25"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Spinal Root Ganglia, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "dorsal root ganglion",
+                "term": "UBERON:0000044"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S26"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Spleen (red pulp), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "red pulp of spleen",
+                "term": "UBERON:0001250"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S27"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Spleen (white pulp), H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "white pulp of spleen",
+                "term": "UBERON:0001959"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S28"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Stomach, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "stomach",
+                "term": "UBERON:0000945"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S29"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Thymus, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "thymus",
+                "term": "UBERON:0002370"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S30"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Vena Cava, H1"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "vena cava",
+                "term": "UBERON:0004087"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S31"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Articular Cartilage (foal), H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-06-30",
+                "units": "YYYY-MM-DD"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 23.5,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "infant",
+                "term": "EFO:0001355"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "articular cartilage of joint",
+                "term": "UBERON:0010996"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H2"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S32"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Embryo (whole embryo, 34 days), H3"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-06-24",
+                "units": "YYYY-MM-DD"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 34.0,
+                "units": "day"
+            },
+            "developmental_stage": {
+                "text": "infant",
+                "term": "EFO:0001355"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "embryo",
+                "term": "UBERON:0000922"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H3"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S33"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Endometrium (pregnant day 16), H4"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-07-02",
+                "units": "YYYY-MM-DD"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 16.0,
+                "units": "day"
+            },
+            "developmental_stage": {
+                "text": "infant",
+                "term": "EFO:0001355"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "endometrium",
+                "term": "UBERON:0001295"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H4"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S34"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Endometrium (pregnant day 50), H5"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-07-02",
+                "units": "YYYY-MM-DD"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 50.0,
+                "units": "day"
+            },
+            "developmental_stage": {
+                "text": "infant",
+                "term": "EFO:0001355"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "endometrium",
+                "term": "UBERON:0001295"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H5"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S35"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Epididymus, H6"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-07-02",
+                "units": "YYYY-MM-DD"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 4.0,
+                "units": "year"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "epididymis",
+                "term": "UBERON:0001301"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H6"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S36"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Muscle (skeletal, tongue), H6"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-07-02",
+                "units": "YYYY-MM-DD"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 4.0,
+                "units": "year"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "tongue muscle",
+                "term": "UBERON:0000378"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H6"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S37"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adipose Tissue, H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 22.1473436587795,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "adipose tissue",
+                "term": "UBERON:0001013"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S38"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adrenal Cortex, H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 22.0911088979704,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "adrenal cortex",
+                "term": "UBERON:0001235"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S39"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Adrenal Medulla, H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 22.0348741371613,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "adrenal medulla",
+                "term": "UBERON:0001236"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S40"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Aorta, H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 21.9786393763522,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "aorta",
+                "term": "UBERON:0000947"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S41"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Bladder, H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 21.9224046155431,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "urinary bladder",
+                "term": "UBERON:0001255"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S42"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Bone, H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 21.866169854734,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "bone tissue",
+                "term": "UBERON:0002481"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S43"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Bone Marrow, H2"
+                },
+                "material": {
+                    "text": "specimen from organism",
+                    "term": "OBI:0001479"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "specimen_collection_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "geographic_location": {
+                "value": "Denmark"
+            },
+            "animal_age_at_collection": {
+                "value": 21.8099350939249,
+                "units": "month"
+            },
+            "developmental_stage": {
+                "text": "adult",
+                "term": "EFO:0001272"
+            },
+            "health_status_at_collection": [
+                {
+                    "text": "normal",
+                    "term": "PATO:0000461"
+                }
+            ],
+            "organism_part": {
+                "text": "bone marrow",
+                "term": "UBERON:0002371"
+            },
+            "specimen_collection_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_H1"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_S44"
+                }
+            }
+        }
+    ],
+    "pool_of_specimens": [
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Pool of Pituitary samples"
+                },
+                "material": {
+                    "text": "pool of specimens",
+                    "term": "OBI:0302716"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "pool_creation_date": {
+                "value": "2005-05",
+                "units": "YYYY-MM"
+            },
+            "pool_creation_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/WUR_SOP_animal_sampling_20160405.pdf"
+            },
+            "derived_from": [
+                {
+                    "value": "ECA_UKY_S1"
+                },
+                {
+                    "value": "ECA_UKY_S2"
+                }
+            ],
+            "custom": {
+                "sample_name": {
+                    "value": "ECA_UKY_P_S21_S22"
+                }
+            }
+        }
+    ],
+    "cell_specimen": [
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Peripheral blood mononuclear cells, H7"
+                },
+                "material": {
+                    "text": "cell specimen",
+                    "term": "OBI:0001468"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "cell_type": [
+                {
+                    "text": "peripheral blood mononuclear cell",
+                    "term": "CL:2000001"
+                }
+            ],
+            "purification_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/ROSLIN_SOP_Blood_Leukocyte_Isolation_20160503.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_S39"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "C1"
+                }
+            }
+        },
+        {
+            "samples_core": {
+                "sample_description": {
+                    "value": "Lymphocytes (activated), H7"
+                },
+                "material": {
+                    "text": "cell specimen",
+                    "term": "OBI:0001468"
+                },
+                "project": {
+                    "value": "FAANG"
+                }
+            },
+            "cell_type": [
+                {
+                    "text": "lymphocyte",
+                    "term": "CL:0000542"
+                }
+            ],
+            "purification_protocol": {
+                "value": "ftp://ftp.faang.ebi.ac.uk/ftp/protocols/samples/ROSLIN_SOP_Blood_Leukocyte_Isolation_20160503.pdf"
+            },
+            "derived_from": {
+                "value": "ECA_UKY_S43"
+            },
+            "custom": {
+                "sample_name": {
+                    "value": "C2"
+                }
+            }
+        }
+    ]
+}
