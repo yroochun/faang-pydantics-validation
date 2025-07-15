@@ -3,7 +3,7 @@ from typing import Optional, List, Literal, Union
 from enum import Enum
 import json
 
-
+# dcc-metadata/master/json_schema/core/samples/faang_samples_core.metadata_rules.json
 class MaterialValidValues(str, Enum):
     ORGANISM = "organism"
     SPECIMEN_FROM_ORGANISM = "specimen from organism"

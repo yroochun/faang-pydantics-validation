@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, validator, HttpUrl
 from typing import Optional, List, Literal, Union
 from enum import Enum
 
-
+# dcc-metadata/master/json_schema/core/samples/faang_samples_core.metadata_rules.json
 class MaterialValidValues(str, Enum):
     """Enumeration for material text values"""
     ORGANISM = "organism"
