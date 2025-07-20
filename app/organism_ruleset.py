@@ -47,16 +47,21 @@ class DeliveryEase(str, Enum):
 class OntologyTerm(BaseModel):
     """Base model for ontology terms"""
     text: str
-    term: Union[str, Literal["restricted access"]]
+    term: str  # This will be more specific in subclasses
     ontology_name: str
 
 
-class Organism(OntologyTerm):
+class Organism(BaseModel):
+    """NCBI taxon ID of organism - REQUIRED"""
+    text: str
+    term: Union[str, Literal["restricted access"]]
     ontology_name: Literal["NCBITaxon"] = "NCBITaxon"
 
 
-class Sex(OntologyTerm):
+class Sex(BaseModel):
     """Animal sex, described using any child term of PATO_0000047 - REQUIRED"""
+    text: str
+    term: Union[str, Literal["restricted access"]]
     ontology_name: Literal["PATO"] = "PATO"
 
 
@@ -83,10 +88,11 @@ class BirthDate(BaseModel):
         return v
 
 
-class Breed(OntologyTerm):
+class Breed(BaseModel):
     """Animal breed, described using the FAANG breed description guidelines - RECOMMENDED"""
-    ontology_name: Literal["LBO"] = "LBO"
+    text: str
     term: Union[str, Literal["not applicable", "restricted access"]]
+    ontology_name: Literal["LBO"] = "LBO"
 
 
 class HealthStatus(BaseModel):
@@ -94,7 +100,6 @@ class HealthStatus(BaseModel):
     text: str
     term: Union[str, Literal["not applicable", "not collected", "not provided", "restricted access"]]
     ontology_name: Literal["PATO", "EFO"]
-
 
 class Diet(BaseModel):
     """Organism diet summary, more detailed information will be recorded in the associated protocols.
