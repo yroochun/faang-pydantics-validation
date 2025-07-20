@@ -103,12 +103,12 @@ class SameAs(BaseModel):
     value: Optional[str] = Field(None, description="BioSample ID for an equivalent sample record")
 
 
-class FAASampleCoreMetadata(BaseModel):
-    # Required fields (these are the only truly mandatory fields)
+class SampleCoreMetadata(BaseModel):
+    # Required fields
     material: Material = Field(..., description="The type of material being described")
     project: Project = Field(..., description="State that the project is 'FAANG'")
 
-    # Optional fields - these entire objects are optional
+    # Optional fields
     describedBy: Optional[
         Literal["https://github.com/FAANG/faang-metadata/blob/master/docs/faang_sample_metadata.md"]] = None
     schema_version: Optional[str] = Field(
@@ -158,148 +158,14 @@ class FAASampleCoreMetadata(BaseModel):
 
 
 # Validation function for individual samples
-def validate_faang_sample(data: dict) -> FAASampleCoreMetadata:
-    """
-    Validate FAANG sample data against the Pydantic model
-
-    Args:
-        data: Dictionary containing sample metadata
-
-    Returns:
-        Validated FAASampleCoreMetadata instance
-
-    Raises:
-        ValidationError: If data doesn't conform to the schema
-    """
+def validate_sample_core(data: dict) -> SampleCoreMetadata:
     try:
-        return FAASampleCoreMetadata(**data)
+        return SampleCoreMetadata(**data)
     except Exception as e:
-        # You can customize error handling here
         raise e
 
 
-# New validation function for organism arrays
-def validate_organism_array(json_file_path: str) -> dict:
-    """
-    Validate the organism array from a FAANG JSON file
-
-    Args:
-        json_file_path: Path to the JSON file containing organism data
-
-    Returns:
-        Dictionary with validation results
-    """
-    try:
-        # Load the JSON file
-        with open(json_file_path, 'r') as f:
-            data = json.load(f)
-
-        # Check if organism array exists
-        if 'organism' not in data:
-            return {
-                'success': False,
-                'error': 'No organism array found in JSON file',
-                'validated_organisms': [],
-                'failed_organisms': []
-            }
-
-        organisms = data['organism']
-        validated_organisms = []
-        failed_organisms = []
-
-        print(f"Found {len(organisms)} organisms to validate...")
-
-        # Validate each organism
-        for i, organism in enumerate(organisms):
-            try:
-                # Extract the samples_core metadata which contains our validation target
-                if 'samples_core' not in organism:
-                    failed_organisms.append({
-                        'index': i,
-                        'error': 'Missing samples_core section',
-                        'sample_name': organism.get('custom', {}).get('sample_name', {}).get('value', f'Organism_{i}')
-                    })
-                    continue
-
-                samples_core = organism['samples_core']
-
-                # Validate the core metadata
-                validated_sample = validate_faang_sample(samples_core)
-
-                # Get sample name for reporting
-                sample_name = organism.get('custom', {}).get('sample_name', {}).get('value', f'Organism_{i}')
-
-                validated_organisms.append({
-                    'index': i,
-                    'sample_name': sample_name,
-                    'validated_data': validated_sample.dict()
-                })
-
-                print(f"✅ Organism {i} ({sample_name}): Validation successful")
-
-            except Exception as e:
-                sample_name = organism.get('custom', {}).get('sample_name', {}).get('value', f'Organism_{i}')
-                failed_organisms.append({
-                    'index': i,
-                    'sample_name': sample_name,
-                    'error': str(e)
-                })
-                print(f"❌ Organism {i} ({sample_name}): Validation failed - {e}")
-
-        # Summary
-        total_organisms = len(organisms)
-        successful_validations = len(validated_organisms)
-        failed_validations = len(failed_organisms)
-
-        print(f"\n📊 Validation Summary:")
-        print(f"Total organisms: {total_organisms}")
-        print(f"Successfully validated: {successful_validations}")
-        print(f"Failed validation: {failed_validations}")
-        print(f"Success rate: {(successful_validations / total_organisms) * 100:.1f}%")
-
-        return {
-            'success': failed_validations == 0,
-            'total_organisms': total_organisms,
-            'successful_validations': successful_validations,
-            'failed_validations': failed_validations,
-            'validated_organisms': validated_organisms,
-            'failed_organisms': failed_organisms
-        }
-
-    except FileNotFoundError:
-        return {
-            'success': False,
-            'error': f'File not found: {json_file_path}',
-            'validated_organisms': [],
-            'failed_organisms': []
-        }
-    except json.JSONDecodeError as e:
-        return {
-            'success': False,
-            'error': f'Invalid JSON format: {e}',
-            'validated_organisms': [],
-            'failed_organisms': []
-        }
-    except Exception as e:
-        return {
-            'success': False,
-            'error': f'Unexpected error: {e}',
-            'validated_organisms': [],
-            'failed_organisms': []
-        }
-
-
-# Simplified validation function for direct use with organism data
-def validate_organisms_from_data(organism_list: List[dict]) -> dict:
-    """
-    Validate a list of organism dictionaries directly
-
-    Args:
-        organism_list: List of organism dictionaries with samples_core sections
-
-    Returns:
-        Dictionary with validation results
-    """
+def validate_organism_list(organism_list: List[dict]) -> dict:
     validated_organisms = []
     failed_organisms = []
 
@@ -319,7 +185,7 @@ def validate_organisms_from_data(organism_list: List[dict]) -> dict:
             samples_core = organism['samples_core']
 
             # Validate the core metadata
-            validated_sample = validate_faang_sample(samples_core)
+            validated_sample = validate_sample_core(samples_core)
 
             # Get sample name for reporting
             sample_name = organism.get('custom', {}).get('sample_name', {}).get('value', f'Organism_{i}')
