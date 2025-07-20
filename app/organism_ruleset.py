@@ -5,14 +5,7 @@ from typing import List, Optional, Union, Literal
 from enum import Enum
 import re
 
-# Import the core metadata model
-from standard_ruleset import FAASampleCoreMetadata
-
-
-class MandatoryLevel(str, Enum):
-    MANDATORY = "mandatory"
-    RECOMMENDED = "recommended"
-    OPTIONAL = "optional"
+from standard_ruleset import SampleCoreMetadata
 
 
 class DateUnits(str, Enum):
@@ -55,27 +48,21 @@ class OntologyTerm(BaseModel):
     """Base model for ontology terms"""
     text: str
     term: Union[str, Literal["restricted access"]]
-    mandatory: MandatoryLevel
     ontology_name: str
 
 
 class Organism(OntologyTerm):
-    """NCBI taxon ID of organism"""
-    mandatory: Literal[MandatoryLevel.MANDATORY] = MandatoryLevel.MANDATORY
     ontology_name: Literal["NCBITaxon"] = "NCBITaxon"
 
 
 class Sex(OntologyTerm):
-    """Animal sex, described using any child term of PATO_0000047"""
-    mandatory: Literal[MandatoryLevel.MANDATORY] = MandatoryLevel.MANDATORY
+    """Animal sex, described using any child term of PATO_0000047 - REQUIRED"""
     ontology_name: Literal["PATO"] = "PATO"
 
 
 class BirthDate(BaseModel):
-    """Birth date, in various formats or special values"""
     value: str
     units: DateUnits
-    mandatory: Literal[MandatoryLevel.RECOMMENDED] = MandatoryLevel.RECOMMENDED
 
     @validator('value')
     def validate_birth_date(cls, v, values):
@@ -97,120 +84,121 @@ class BirthDate(BaseModel):
 
 
 class Breed(OntologyTerm):
-    """Animal breed, described using the FAANG breed description guidelines"""
-    mandatory: Literal[MandatoryLevel.RECOMMENDED] = MandatoryLevel.RECOMMENDED
+    """Animal breed, described using the FAANG breed description guidelines - RECOMMENDED"""
     ontology_name: Literal["LBO"] = "LBO"
     term: Union[str, Literal["not applicable", "restricted access"]]
 
 
 class HealthStatus(BaseModel):
-    """Health status using terms from PATO or EFO"""
+    """Health status using terms from PATO or EFO - RECOMMENDED"""
     text: str
     term: Union[str, Literal["not applicable", "not collected", "not provided", "restricted access"]]
-    mandatory: Literal[MandatoryLevel.RECOMMENDED] = MandatoryLevel.RECOMMENDED
     ontology_name: Literal["PATO", "EFO"]
 
 
 class Diet(BaseModel):
-    """Organism diet summary"""
+    """Organism diet summary, more detailed information will be recorded in the associated protocols.
+    Particuarly important for projects with controlled diet treatements.
+    Free text field, but ensure standardisation within each study"""
     value: str
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class BirthLocation(BaseModel):
-    """Name of the birth location"""
+    """Name of the birth location - OPTIONAL"""
     value: str
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class BirthLocationLatitude(BaseModel):
-    """Latitude of the birth location in decimal degrees"""
+    """Latitude of the birth location in decimal degrees - OPTIONAL"""
     value: float
     units: Literal["decimal degrees"] = "decimal degrees"
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class BirthLocationLongitude(BaseModel):
-    """Longitude of the birth location in decimal degrees"""
+    """Longitude of the birth location in decimal degrees - OPTIONAL"""
     value: float
     units: Literal["decimal degrees"] = "decimal degrees"
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class BirthWeight(BaseModel):
-    """Birth weight, in kilograms or grams"""
+    """Birth weight, in kilograms or grams - OPTIONAL"""
     value: float
     units: WeightUnits
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class PlacentalWeight(BaseModel):
-    """Placental weight, in kilograms or grams"""
+    """Placental weight, in kilograms or grams - OPTIONAL"""
     value: float
     units: WeightUnits
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class PregnancyLength(BaseModel):
-    """Pregnancy length of time, in days, weeks or months"""
+    """Pregnancy length of time, in days, weeks or months - OPTIONAL"""
     value: float
     units: TimeUnits
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class DeliveryTimingField(BaseModel):
-    """Was pregnancy full-term, early or delayed"""
+    """Was pregnancy full-term, early or delayed - OPTIONAL"""
     value: DeliveryTiming
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class DeliveryEaseField(BaseModel):
-    """Did the delivery require assistance"""
+    """Did the delivery require assistance - OPTIONAL"""
     value: DeliveryEase
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class Pedigree(BaseModel):
-    """A link to pedigree information for the animal"""
+    """A link to pedigree information for the animal - OPTIONAL"""
     value: AnyUrl
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class ChildOf(BaseModel):
-    """Sample name or Biosample ID for sire/dam"""
+    """Sample name or Biosample ID for sire/dam - OPTIONAL"""
     value: str
-    mandatory: Literal[MandatoryLevel.OPTIONAL] = MandatoryLevel.OPTIONAL
 
 
 class FAANGOrganismSample(BaseModel):
-    """FAANG organism sample metadata model"""
+    """FAANG organism sample metadata model
 
-    # Required fields - samples_core now references the imported core metadata
-    samples_core: FAASampleCoreMetadata = Field(
+    Field requirement levels:
+    - REQUIRED: samples_core, organism, sex
+    - RECOMMENDED: birth_date, breed, health_status
+    - OPTIONAL: all other fields
+    """
+
+    # REQUIRED fields
+    samples_core: SampleCoreMetadata = Field(
         ...,
-        description="Core samples-level information from faang_samples_core.metadata_rules.json"
+        description="Core samples-level information."
     )
-    organism: Organism
-    sex: Sex
+    organism: Organism = Field(..., description="NCBI taxon ID of organism.")
+    sex: Sex = Field(..., description="Animal sex, described using any child term of PATO_0000047.")
 
-    # Optional fields with default descriptions
+    # Schema metadata
     describedBy: Optional[str] = Field(
         default="https://github.com/FAANG/faang-metadata/blob/master/docs/faang_sample_metadata.md",
         const=True
     )
-
     schema_version: Optional[str] = Field(
         default=None,
         regex=r'^[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}$',
         description="The version number of the schema in major.minor.patch format"
     )
 
-    # Recommended fields
-    birth_date: Optional[BirthDate] = None
-    breed: Optional[Breed] = None
-    health_status: Optional[List[HealthStatus]] = None
+    # RECOMMENDED fields - Optional but encouraged
+    birth_date: Optional[BirthDate] = Field(None, description="Birth date, in the format YYYY-MM-DD, or YYYY-MM where "
+                                                              "only the month is known. For embryo samples record "
+                                                              "'not applicable")
+    breed: Optional[Breed] = Field(None, description="Animal breed, described using the FAANG breed description "
+                                                     "guidelines (http://bit.ly/FAANGbreed). Should be considered "
+                                                     "mandatory for terrestiral species, for aquatic species "
+                                                     "record 'not applicable'.")
+    health_status: Optional[List[HealthStatus]] = Field(None, description="Healthy animals should have the term normal, "
+                                                                          "otherwise use the as many disease terms as "
+                                                                          "necessary from EFO.")
 
-    # Optional fields
+    # OPTIONAL fields
     diet: Optional[Diet] = None
     birth_location: Optional[BirthLocation] = None
     birth_location_latitude: Optional[BirthLocationLatitude] = None
@@ -221,19 +209,18 @@ class FAANGOrganismSample(BaseModel):
     delivery_timing: Optional[DeliveryTimingField] = None
     delivery_ease: Optional[DeliveryEaseField] = None
     pedigree: Optional[Pedigree] = None
-    child_of: Optional[List[ChildOf]] = Field(default=None, min_items=1, max_items=2)
+    child_of: Optional[List[ChildOf]] = Field(default=None, min_items=1, max_items=2,
+                                              description="Healthy animals should have the term normal, otherwise use "
+                                                          "the as many disease terms as necessary from EFO.")
 
     class Config:
-        # Allow extra fields that might be added in the future
         extra = "forbid"
-        # Use enum values for serialization
         use_enum_values = True
-        # Validate assignment
         validate_assignment = True
 
 
 # Validation function for organism samples
-def validate_organism_sample(data: dict) -> FAANGOrganismSample:
+def validate_faang_organism_sample(data: dict) -> FAANGOrganismSample:
     """
     Validate FAANG organism sample data against the Pydantic model
 
@@ -252,9 +239,38 @@ def validate_organism_sample(data: dict) -> FAANGOrganismSample:
         raise e
 
 
+# Utility function to get field requirement levels
+def get_field_requirements() -> dict:
+    """Return a mapping of field names to their requirement levels"""
+    return {
+        # Required fields
+        "samples_core": "required",
+        "organism": "required",
+        "sex": "required",
+
+        # Recommended fields
+        "birth_date": "recommended",
+        "breed": "recommended",
+        "health_status": "recommended",
+
+        # Optional fields
+        "diet": "optional",
+        "birth_location": "optional",
+        "birth_location_latitude": "optional",
+        "birth_location_longitude": "optional",
+        "birth_weight": "optional",
+        "placental_weight": "optional",
+        "pregnancy_length": "optional",
+        "delivery_timing": "optional",
+        "delivery_ease": "optional",
+        "pedigree": "optional",
+        "child_of": "optional",
+    }
+
+
 # Example usage and validation
 if __name__ == "__main__":
-    # Example of creating a valid organism sample
+    # Example of creating a valid organism sample (without mandatory fields)
     sample_data = {
         "samples_core": {
             "material": {
@@ -273,39 +289,41 @@ if __name__ == "__main__":
         "organism": {
             "text": "Bos taurus",
             "term": "NCBITaxon:9913",
-            "mandatory": "mandatory",
             "ontology_name": "NCBITaxon"
         },
         "sex": {
             "text": "female",
             "term": "PATO:0000383",
-            "mandatory": "mandatory",
             "ontology_name": "PATO"
         },
         "birth_date": {
             "value": "2020-03-15",
-            "units": "YYYY-MM-DD",
-            "mandatory": "recommended"
+            "units": "YYYY-MM-DD"
         },
         "breed": {
             "text": "Holstein",
             "term": "LBO:0000001",
-            "mandatory": "recommended",
             "ontology_name": "LBO"
         },
         "health_status": [
             {
                 "text": "normal",
                 "term": "PATO:0000461",
-                "mandatory": "recommended",
                 "ontology_name": "PATO"
             }
         ]
     }
 
     try:
-        sample = validate_organism_sample(sample_data)
+        sample = validate_faang_organism_sample(sample_data)
         print("Organism sample created successfully!")
         print(sample.json(indent=2))
+
+        # Show field requirements
+        print("\nField requirement levels:")
+        requirements = get_field_requirements()
+        for field, level in requirements.items():
+            print(f"  {field}: {level}")
+
     except Exception as e:
         print(f"Validation error: {e}")
