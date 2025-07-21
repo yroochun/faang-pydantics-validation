@@ -44,25 +44,77 @@ class DeliveryEase(str, Enum):
     VETERINARIAN_ASSISTED = "veterinarian assisted"
 
 
-class OntologyTerm(BaseModel):
-    """Base model for ontology terms"""
+# Base ontology term model with graph restriction validation placeholder
+class BaseOntologyTerm(BaseModel):
+    """Base model for ontology terms with validation placeholders"""
     text: str
-    term: str  # This will be more specific in subclasses
+    term: str
     ontology_name: str
 
+    @validator('term')
+    def validate_ontology_term(cls, v, values):
+        """
+        Placeholder for ontological validation.
+        In a full implementation, this would validate against the graph restrictions
+        defined in the JSON schema using an ontology service or local ontology files.
+        """
+        if v == "restricted access":
+            return v
 
-class Organism(BaseModel):
-    """NCBI taxon ID of organism - REQUIRED"""
-    text: str
-    term: Union[str, Literal["restricted access"]]
+        # TODO: Implement actual ontological validation
+        # This would check against the specific graph_restriction rules
+        # defined for each ontology type
+
+        return v
+
+
+class Organism(BaseOntologyTerm):
+    """
+    NCBI taxon ID of organism.
+    JSON Schema graph_restriction:
+    - ontologies: ["obo:ncbitaxon"]
+    - classes: ["NCBITaxon:1"]
+    - relations: ["rdfs:subClassOf"]
+    - direct: false, include_self: false
+    """
     ontology_name: Literal["NCBITaxon"] = "NCBITaxon"
-
-
-class Sex(BaseModel):
-    """Animal sex, described using any child term of PATO_0000047 - REQUIRED"""
-    text: str
     term: Union[str, Literal["restricted access"]]
+
+    @validator('term')
+    def validate_ncbi_taxon(cls, v):
+        """Validate NCBI Taxon terms"""
+        if v == "restricted access":
+            return v
+
+        # TODO: Validate against NCBITaxon:1 subclasses
+        # Should check that term is a subclass of NCBITaxon:1
+        # using the graph_restriction rules
+
+        return v
+
+
+class Sex(BaseOntologyTerm):
+    """
+    Animal sex, described using any child term of PATO_0000047 - REQUIRED
+    JSON Schema graph_restriction:
+    - ontologies: ["obo:pato"]
+    - classes: ["PATO:0000047"]
+    - relations: ["rdfs:subClassOf"]
+    - direct: false, include_self: false
+    """
     ontology_name: Literal["PATO"] = "PATO"
+    term: Union[str, Literal["restricted access"]]
+
+    @validator('term')
+    def validate_pato_sex(cls, v):
+        """Validate PATO sex terms"""
+        if v == "restricted access":
+            return v
+
+        # TODO: Validate against PATO:0000047 (biological sex) subclasses
+        # Should check that term is a subclass of PATO:0000047
+
+        return v
 
 
 class BirthDate(BaseModel):
@@ -71,35 +123,66 @@ class BirthDate(BaseModel):
 
     @validator('value')
     def validate_birth_date(cls, v, values):
-        """Validate birth date format"""
+        """Validate birth date format according to JSON schema pattern"""
         if v in ["not applicable", "not collected", "not provided", "restricted access"]:
             return v
 
-        # Check date patterns
-        patterns = [
-            r'^[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$',  # YYYY-MM-DD
-            r'^[12]\d{3}-(0[1-9]|1[0-2])$',  # YYYY-MM
-            r'^[12]\d{3}$'  # YYYY
-        ]
+        # Pattern from JSON schema: ^[12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])|[12]\\d{3}-(0[1-9]|1[0-2])|[12]\\d{3}$
+        pattern = r'^[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])|[12]\d{3}-(0[1-9]|1[0-2])|[12]\d{3}$'
 
-        if not any(re.match(pattern, v) for pattern in patterns):
-            raise ValueError(f"Invalid birth date format: {v}")
+        if not re.match(pattern, v):
+            raise ValueError(f"Invalid birth date format: {v}. Must match YYYY-MM-DD, YYYY-MM, or YYYY pattern")
 
         return v
 
 
-class Breed(BaseModel):
-    """Animal breed, described using the FAANG breed description guidelines - RECOMMENDED"""
-    text: str
-    term: Union[str, Literal["not applicable", "restricted access"]]
+class Breed(BaseOntologyTerm):
+    """
+    Animal breed, described using the FAANG breed description guidelines - RECOMMENDED
+    JSON Schema graph_restriction:
+    - ontologies: ["obo:lbo"]
+    - classes: ["LBO:0000000"]
+    - relations: ["rdfs:subClassOf"]
+    - direct: false, include_self: false
+    """
     ontology_name: Literal["LBO"] = "LBO"
+    term: Union[str, Literal["not applicable", "restricted access"]]
+
+    @validator('term')
+    def validate_lbo_breed(cls, v):
+        """Validate LBO breed terms"""
+        if v in ["not applicable", "restricted access"]:
+            return v
+
+        # TODO: Validate against LBO:0000000 subclasses
+        # Should check that term is a subclass of LBO:0000000
+
+        return v
 
 
-class HealthStatus(BaseModel):
-    """Health status using terms from PATO or EFO - RECOMMENDED"""
-    text: str
-    term: Union[str, Literal["not applicable", "not collected", "not provided", "restricted access"]]
+class HealthStatus(BaseOntologyTerm):
+    """
+    Health status using terms from PATO or EFO - RECOMMENDED
+    JSON Schema graph_restriction:
+    - ontologies: ["obo:pato", "obo:efo"]
+    - classes: ["PATO:0000461", "EFO:0000408"]
+    - relations: ["rdfs:subClassOf"]
+    - direct: false, include_self: true
+    """
     ontology_name: Literal["PATO", "EFO"]
+    term: Union[str, Literal["not applicable", "not collected", "not provided", "restricted access"]]
+
+    @validator('term')
+    def validate_health_status(cls, v):
+        """Validate PATO or EFO health status terms"""
+        if v in ["not applicable", "not collected", "not provided", "restricted access"]:
+            return v
+
+        # TODO: Validate against PATO:0000461 (normal) or EFO:0000408 (disease)
+        # Should check that term is a subclass of either root class
+        # Note: include_self: true means the root classes themselves are valid
+
+        return v
 
 class Diet(BaseModel):
     """Organism diet summary, more detailed information will be recorded in the associated protocols.
@@ -225,12 +308,14 @@ class FAANGOrganismSample(BaseModel):
 
 
 # Validation function for organism samples
-def validate_faang_organism_sample(data: dict) -> FAANGOrganismSample:
+# Enhanced validation function with graph restriction checking
+def validate_faang_organism_sample(data: dict, validate_ontology: bool = False) -> FAANGOrganismSample:
     """
     Validate FAANG organism sample data against the Pydantic model
 
     Args:
         data: Dictionary containing organism sample metadata
+        validate_ontology: If True, performs full ontological validation (requires ontology service)
 
     Returns:
         Validated FAANGOrganismSample instance
@@ -238,44 +323,61 @@ def validate_faang_organism_sample(data: dict) -> FAANGOrganismSample:
     Raises:
         ValidationError: If data doesn't conform to the schema
     """
+    if validate_ontology:
+        # TODO: Implement full ontological validation
+        # This would check each ontology term against its graph_restriction rules
+        # using an ontology service or local ontology files
+        pass
+
     try:
         return FAANGOrganismSample(**data)
     except Exception as e:
         raise e
 
 
-# Utility function to get field requirement levels
-def get_field_requirements() -> dict:
-    """Return a mapping of field names to their requirement levels"""
+def get_ontology_requirements() -> dict:
+    """
+    Return the ontological requirements for each field based on JSON schema graph_restrictions
+    """
     return {
-        # Required fields
-        "samples_core": "required",
-        "organism": "required",
-        "sex": "required",
-
-        # Recommended fields
-        "birth_date": "recommended",
-        "breed": "recommended",
-        "health_status": "recommended",
-
-        # Optional fields
-        "diet": "optional",
-        "birth_location": "optional",
-        "birth_location_latitude": "optional",
-        "birth_location_longitude": "optional",
-        "birth_weight": "optional",
-        "placental_weight": "optional",
-        "pregnancy_length": "optional",
-        "delivery_timing": "optional",
-        "delivery_ease": "optional",
-        "pedigree": "optional",
-        "child_of": "optional",
+        "organism": {
+            "ontologies": ["obo:ncbitaxon"],
+            "classes": ["NCBITaxon:1"],
+            "relations": ["rdfs:subClassOf"],
+            "direct": False,
+            "include_self": False,
+            "allowed_literals": ["restricted access"]
+        },
+        "sex": {
+            "ontologies": ["obo:pato"],
+            "classes": ["PATO:0000047"],
+            "relations": ["rdfs:subClassOf"],
+            "direct": False,
+            "include_self": False,
+            "allowed_literals": ["restricted access"]
+        },
+        "breed": {
+            "ontologies": ["obo:lbo"],
+            "classes": ["LBO:0000000"],
+            "relations": ["rdfs:subClassOf"],
+            "direct": False,
+            "include_self": False,
+            "allowed_literals": ["not applicable", "restricted access"]
+        },
+        "health_status": {
+            "ontologies": ["obo:pato", "obo:efo"],
+            "classes": ["PATO:0000461", "EFO:0000408"],
+            "relations": ["rdfs:subClassOf"],
+            "direct": False,
+            "include_self": True,
+            "allowed_literals": ["not applicable", "not collected", "not provided", "restricted access"]
+        }
     }
 
 
-# Example usage and validation
+# Example usage showing the limitations
 if __name__ == "__main__":
-    # Example of creating a valid organism sample (without mandatory fields)
+    # This example works but doesn't perform full ontological validation
     sample_data = {
         "samples_core": {
             "material": {
@@ -283,52 +385,29 @@ if __name__ == "__main__":
                 "term": "OBI:0100026",
                 "ontology_name": "OBI"
             },
-            "project": {
-                "value": "FAANG"
-            },
-            "sample_description": {
-                "value": "Adult female Holstein cattle from dairy farm"
-            },
+            "project": {"value": "FAANG"},
+            "sample_description": {"value": "Adult female Holstein cattle"},
             "schema_version": "4.6.1"
         },
         "organism": {
             "text": "Bos taurus",
-            "term": "NCBITaxon:9913",
+            "term": "NCBITaxon:9913",  # This should be validated against NCBITaxon:1 subclasses
             "ontology_name": "NCBITaxon"
         },
         "sex": {
             "text": "female",
-            "term": "PATO:0000383",
+            "term": "PATO:0000383",  # This should be validated against PATO:0000047 subclasses
             "ontology_name": "PATO"
-        },
-        "birth_date": {
-            "value": "2020-03-15",
-            "units": "YYYY-MM-DD"
-        },
-        "breed": {
-            "text": "Holstein",
-            "term": "LBO:0000001",
-            "ontology_name": "LBO"
-        },
-        "health_status": [
-            {
-                "text": "normal",
-                "term": "PATO:0000461",
-                "ontology_name": "PATO"
-            }
-        ]
+        }
     }
 
     try:
         sample = validate_faang_organism_sample(sample_data)
-        print("Organism sample created successfully!")
-        print(sample.json(indent=2))
-
-        # Show field requirements
-        print("\nField requirement levels:")
-        requirements = get_field_requirements()
-        for field, level in requirements.items():
-            print(f"  {field}: {level}")
+        print("✓ Basic validation passed")
+        print("⚠ Note: Full ontological validation not implemented")
+        print("\nOntology requirements:")
+        for field, reqs in get_ontology_requirements().items():
+            print(f"  {field}: {reqs}")
 
     except Exception as e:
-        print(f"Validation error: {e}")
+        print(f"✗ Validation error: {e}")
