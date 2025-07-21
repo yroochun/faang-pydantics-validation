@@ -49,7 +49,7 @@ class BaseOntologyTerm(BaseModel):
     """Base model for ontology terms with validation placeholders"""
     text: str
     term: str
-    ontology_name: str
+    ontology_name: Optional[str] = None
 
     @validator('term')
     def validate_ontology_term(cls, v, values):
@@ -169,7 +169,7 @@ class HealthStatus(BaseOntologyTerm):
     - relations: ["rdfs:subClassOf"]
     - direct: false, include_self: true
     """
-    ontology_name: Literal["PATO", "EFO"]
+    ontology_name: Optional[Literal["PATO", "EFO"]] = None
     term: Union[str, Literal["not applicable", "not collected", "not provided", "restricted access"]]
 
     @validator('term')
@@ -246,6 +246,12 @@ class ChildOf(BaseModel):
     value: str
 
 
+class SampleName(BaseModel):
+    value: str
+
+class Custom(BaseModel):
+    sample_name: SampleName
+
 class FAANGOrganismSample(BaseModel):
     """FAANG organism sample metadata model
 
@@ -300,6 +306,7 @@ class FAANGOrganismSample(BaseModel):
     child_of: Optional[List[ChildOf]] = Field(default=None, min_items=1, max_items=2,
                                               description="Healthy animals should have the term normal, otherwise use "
                                                           "the as many disease terms as necessary from EFO.")
+    custom: Optional[Custom] = None
 
     class Config:
         extra = "forbid"

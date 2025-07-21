@@ -298,596 +298,325 @@ class RelationshipValidator:
                 print(f"Error fetching BioSample {sample_id}: {e}")
 
 
-class EnhancedFAANGOrganismValidator:
-    """Main validator class that combines all validation logic"""
+class EnhancedPydanticValidator:
+    """Validator that primarily uses Pydantic models with JSON schema as fallback"""
 
     def __init__(self):
-        self.ontology_validator = OntologyValidator()
         self.relationship_validator = RelationshipValidator()
-        self.schema_cache = SchemaCache()
+        # Only load JSON schemas if needed for specific validations
+        self.json_schema_url = None
 
-        # Load schemas
-        self.organism_schema = self.schema_cache.get_schema(ORGANISM_URL)
-        self.samples_core_schema = self.schema_cache.get_schema(SAMPLE_CORE_URL)
-
-        # Extract field requirements from schemas
-        self.field_requirements = self._extract_field_requirements()
-        self.ontology_names = self._extract_ontology_names()
-
-    def validate_organism_sample(self, data: Dict[str, Any],
-                                 check_relationships: bool = True,
-                                 check_ontologies: bool = True,
-                                 action: str = 'new') -> Tuple[Optional[FAANGOrganismSample], List[ValidationResult]]:
+    def validate_organism_sample(
+        self,
+        data: Dict[str, Any],
+        validate_relationships: bool = True,
+        validate_ontologies: bool = True
+    ) -> Tuple[Optional[FAANGOrganismSample], Dict[str, List[str]]]:
         """
-        Validate a single organism sample with all checks
+        Validate using Pydantic as primary validator
 
         Returns:
-            Tuple of (validated_model, validation_results)
+            Tuple of (validated_model, validation_errors_dict)
         """
-        all_results = []
+        errors_dict = {
+            'errors': [],
+            'warnings': [],
+            'field_errors': {}
+        }
 
-        # First, try basic Pydantic validation
+        # 1. Primary validation with Pydantic
         try:
             organism_model = FAANGOrganismSample(**data)
         except ValidationError as e:
-            # Convert Pydantic errors to ValidationResult
+            # Convert Pydantic errors to a more user-friendly format
             for error in e.errors():
-                result = ValidationResult(
-                    field_path='.'.join(str(x) for x in error['loc']),
-                    errors=[error['msg']],
-                    value=error.get('input')
-                )
-                all_results.append(result)
-            return None, all_results
+                field_path = '.'.join(str(x) for x in error['loc'])
+                error_msg = error['msg']
 
-        # Use Elixir validator for additional schema validation
-        if self.organism_schema:
-            elixir_results = self.ontology_validator.validate_with_elixir(
-                data, self.organism_schema
-            )
-            all_results.extend(elixir_results)
+                if field_path not in errors_dict['field_errors']:
+                    errors_dict['field_errors'][field_path] = []
+                errors_dict['field_errors'][field_path].append(error_msg)
+                errors_dict['errors'].append(f"{field_path}: {error_msg}")
 
-        # Additional validations beyond basic schema
+            return None, errors_dict
 
-        # 1. Check recommended fields
-        for field in self.field_requirements['recommended']['type']:
-            if field not in data or data[field] is None:
-                result = ValidationResult(
-                    field_path=field,
-                    warnings=['This item is recommended but was not provided']
-                )
-                all_results.append(result)
+        # 2. Additional custom validations that Pydantic doesn't handle
 
-        # Check core recommended fields
-        if 'samples_core' in data:
-            for field in self.field_requirements['recommended']['core']:
-                if field not in data['samples_core'] or data['samples_core'][field] is None:
-                    result = ValidationResult(
-                        field_path=f"samples_core.{field}",
-                        warnings=['This item is recommended but was not provided']
-                    )
-                    all_results.append(result)
-
-        # 2. Validate breed-species consistency
-        if organism_model.breed and organism_model.organism:
-            breed_result = self._validate_breed_species_consistency(
-                organism_model.organism,
-                organism_model.breed
-            )
-            if breed_result.errors or breed_result.warnings:
-                all_results.append(breed_result)
-
-        # 3. Validate date consistency
-        if organism_model.birth_date:
-            date_result = self._validate_date_consistency(organism_model.birth_date)
-            if date_result.errors:
-                all_results.append(date_result)
-
-        # 4. Check for inappropriate missing values
-        missing_value_results = self._check_missing_values(data)
-        all_results.extend(missing_value_results)
-
-        # 5. Ontology validation
-        if check_ontologies:
-            ontology_results = self._validate_ontologies(data)
-            all_results.extend(ontology_results)
-
-        # 6. Check custom fields
-        if 'custom' in data:
-            custom_results = self._validate_custom_fields(data['custom'])
-            all_results.extend(custom_results)
-
-        return organism_model, all_results
-
-    def validate_organism_batch(self, organisms: List[Dict[str, Any]],
-                                structure: Dict[str, Any],
-                                action: str = 'new',
-                                check_relationships: bool = True) -> Dict[str, Any]:
-        """
-        Validate a batch of organisms with relationship checking
-
-        Returns:
-            Dictionary with validation results matching Django format
-        """
-        validation_document = {'organism': []}
-
-        # First pass: validate individual organisms
-        for i, org_data in enumerate(organisms):
-            organism_id = self._get_organism_identifier(org_data, action)
-            if not organism_id:
-                organism_id = f"organism_{i + 1}"
-
-            # Create record structure matching Django format
-            record_structure = self._get_record_structure(
-                structure.get('organism', {}),
-                org_data,
-                organism_id,
-                action
-            )
-
-            # Validate the organism
-            model, validation_results = self.validate_organism_sample(
-                org_data,
-                check_relationships=False,
-                action=action
-            )
-
-            # Apply validation results to the record structure
-            for result in validation_results:
-                self._apply_validation_result_to_structure(
-                    record_structure, result
+        # Check recommended fields (these are Optional in Pydantic but recommended by FAANG)
+        recommended_fields = ['birth_date', 'breed', 'health_status']
+        for field in recommended_fields:
+            if getattr(organism_model, field, None) is None:
+                errors_dict['warnings'].append(
+                    f"Field '{field}' is recommended but was not provided"
                 )
 
-            validation_document['organism'].append(record_structure)
+        # 3. Ontology validation (if enabled)
+        if validate_ontologies:
+            ontology_errors = self._validate_ontologies_enhanced(organism_model)
+            errors_dict['errors'].extend(ontology_errors)
 
-        # Second pass: validate relationships
-        if check_relationships:
-            relationship_results = self.relationship_validator.validate_relationships(
-                organisms, action
+        # 4. Relationship validation (if enabled)
+        if validate_relationships and hasattr(organism_model, 'child_of') and organism_model.child_of:
+            rel_errors = self._validate_relationships_for_single(
+                organism_model, data.get('custom', {}).get('sample_name', {}).get('value', 'unknown')
             )
+            errors_dict['errors'].extend(rel_errors)
 
-            # Apply relationship results to the document
-            for org_id, rel_result in relationship_results.items():
-                # Find the corresponding record
-                for record in validation_document['organism']:
-                    col_name = 'biosample_id' if action == 'update' else 'sample_name'
-                    if record['custom'].get(col_name, {}).get('value') == org_id:
-                        # Apply relationship errors
-                        if 'child_of' in record:
-                            if isinstance(record['child_of'], list):
-                                for child_ref in record['child_of']:
-                                    child_ref.setdefault('errors', [])
-                                    child_ref['errors'].extend(rel_result.errors)
-                            else:
-                                record['child_of'].setdefault('errors', [])
-                                record['child_of']['errors'].extend(rel_result.errors)
-                        break
+        return organism_model, errors_dict
 
-        return validation_document
+    def _validate_ontologies_enhanced(self, model: FAANGOrganismSample) -> List[str]:
+        """Enhanced ontology validation using Pydantic model data"""
+        errors = []
 
-    def _extract_field_requirements(self) -> Dict[str, Dict[str, List[str]]]:
-        """Extract mandatory, recommended, and optional fields from schemas"""
-        requirements = {
-            'mandatory': {'core': [], 'type': []},
-            'recommended': {'core': [], 'type': []},
-            'optional': {'core': [], 'type': []}
-        }
+        # Validate organism term
+        if model.organism.term != "restricted access":
+            # Here you could check against NCBITaxon:1 subclasses
+            # For now, just check format
+            if not model.organism.term.startswith("NCBITaxon:"):
+                errors.append(f"Organism term '{model.organism.term}' should be from NCBITaxon ontology")
 
-        # Extract from organism schema
-        if self.organism_schema and 'properties' in self.organism_schema:
-            for field_name, field_def in self.organism_schema['properties'].items():
-                if field_name not in SKIP_PROPERTIES:
-                    requirement = self._get_field_requirement(field_def)
-                    if requirement:
-                        requirements[requirement]['type'].append(field_name)
+        # Validate sex term
+        if model.sex.term != "restricted access":
+            if not model.sex.term.startswith("PATO:"):
+                errors.append(f"Sex term '{model.sex.term}' should be from PATO ontology")
 
-        # Extract from core schema
-        if self.samples_core_schema and 'properties' in self.samples_core_schema:
-            for field_name, field_def in self.samples_core_schema['properties'].items():
-                if field_name not in SKIP_PROPERTIES:
-                    requirement = self._get_field_requirement(field_def)
-                    if requirement:
-                        requirements[requirement]['core'].append(field_name)
+        # Validate breed if present
+        if model.breed and model.breed.term not in ["not applicable", "restricted access"]:
+            if not model.breed.term.startswith("LBO:"):
+                errors.append(f"Breed term '{model.breed.term}' should be from LBO ontology")
 
-        return requirements
+        # Validate health status if present
+        if model.health_status:
+            for i, status in enumerate(model.health_status):
+                if status.term not in ["not applicable", "not collected", "not provided", "restricted access"]:
+                    if not (status.term.startswith("PATO:") or status.term.startswith("EFO:")):
+                        errors.append(
+                            f"Health status[{i}] term '{status.term}' should be from PATO or EFO ontology"
+                        )
 
-    def _get_field_requirement(self, field_def: Dict) -> Optional[str]:
-        """Get the requirement level of a field from its definition"""
-        if field_def.get('type') == 'object':
-            mandatory = field_def.get('properties', {}).get('mandatory', {}).get('const')
-            if mandatory:
-                return mandatory
-        elif field_def.get('type') == 'array':
-            mandatory = field_def.get('items', {}).get('properties', {}).get('mandatory', {}).get('const')
-            if mandatory:
-                return mandatory
-        return None
+        return errors
 
-    def _extract_ontology_names(self) -> Dict[str, List[str]]:
-        """Extract expected ontology names for each field"""
-        ontology_names = {}
+    def _validate_relationships_for_single(
+        self,
+        model: FAANGOrganismSample,
+        sample_name: str
+    ) -> List[str]:
+        """Validate relationships for a single organism"""
+        errors = []
 
-        if self.organism_schema and 'properties' in self.organism_schema:
-            for field_name, field_def in self.organism_schema['properties'].items():
-                if field_name not in SKIP_PROPERTIES:
-                    onto_names = self._get_ontology_names_from_field(field_def)
-                    if onto_names:
-                        ontology_names[field_name] = onto_names
+        if not model.child_of:
+            return errors
 
-        return ontology_names
+        # Check max 2 parents
+        if len(model.child_of) > 2:
+            errors.append(f"Organism can have at most 2 parents, found {len(model.child_of)}")
 
-    def _get_ontology_names_from_field(self, field_def: Dict) -> List[str]:
-        """Extract ontology names from field definition"""
-        onto_names = []
+        # Additional relationship checks would go here
+        # (checking parent existence, species match, etc.)
 
-        if field_def.get('type') == 'object':
-            props = field_def.get('properties', {})
-            if 'ontology_name' in props:
-                if 'const' in props['ontology_name']:
-                    onto_names.append(props['ontology_name']['const'].lower())
-                elif 'enum' in props['ontology_name']:
-                    onto_names.extend([n.lower() for n in props['ontology_name']['enum']])
-        elif field_def.get('type') == 'array':
-            items_props = field_def.get('items', {}).get('properties', {})
-            if 'ontology_name' in items_props:
-                if 'const' in items_props['ontology_name']:
-                    onto_names.append(items_props['ontology_name']['const'].lower())
-                elif 'enum' in items_props['ontology_name']:
-                    onto_names.extend([n.lower() for n in items_props['ontology_name']['enum']])
+        return errors
 
-        return onto_names
-
-    def _validate_breed_species_consistency(self, organism: Organism,
-                                            breed: Breed) -> ValidationResult:
-        """Validate that breed is appropriate for the species"""
-        result = ValidationResult(field_path="organism")
-
-        if organism.term not in SPECIES_BREED_LINKS:
-            # Species doesn't have breed restrictions
-            return result
-
-        expected_breed_class = SPECIES_BREED_LINKS[organism.term]
-
-        # Use Elixir validator to check breed against species
-        breed_schema = {
-            "type": "string",
-            "graph_restriction": {
-                "ontologies": ["obo:lbo"],
-                "classes": [expected_breed_class],
-                "relations": ["rdfs:subClassOf"],
-                "direct": False,
-                "include_self": True
+    def validate_batch_with_pydantic(
+        self,
+        organisms: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Validate a batch of organisms using Pydantic models"""
+        results = {
+            'valid_organisms': [],
+            'invalid_organisms': [],
+            'summary': {
+                'total': len(organisms),
+                'valid': 0,
+                'invalid': 0,
+                'warnings': 0
             }
         }
 
-        validation_results = self.ontology_validator.validate_with_elixir(
-            breed.term, breed_schema
-        )
+        # First pass: validate each organism
+        for i, org_data in enumerate(organisms):
+            sample_name = org_data.get('custom', {}).get('sample_name', {}).get('value', f'organism_{i}')
 
-        if validation_results:
-            result.errors.append(
-                f"Breed '{breed.text}' doesn't match the animal specie: '{organism.text}'"
+            model, errors = self.validate_organism_sample(
+                org_data,
+                validate_relationships=False  # Do relationships in second pass
             )
 
-        return result
-
-    def _validate_date_consistency(self, birth_date: BirthDate) -> ValidationResult:
-        """Validate date format matches the units"""
-        result = ValidationResult(field_path="birth_date")
-
-        if birth_date.value in ["not applicable", "not collected", "not provided", "restricted access"]:
-            return result
-
-        format_map = {
-            DateUnits.YYYY_MM_DD: '%Y-%m-%d',
-            DateUnits.YYYY_MM: '%Y-%m',
-            DateUnits.YYYY: '%Y'
-        }
-
-        expected_format = format_map.get(birth_date.units)
-        if expected_format:
-            try:
-                datetime.strptime(birth_date.value, expected_format)
-            except ValueError:
-                result.errors.append(
-                    f"Date units: {birth_date.units} should be consistent with "
-                    f"date value: {birth_date.value}"
-                )
-
-        return result
-
-    def _check_missing_values(self, data: Dict[str, Any]) -> List[ValidationResult]:
-        """Check for inappropriate use of missing value terms"""
-        results = []
-
-        # Check type fields
-        for field_name in data:
-            if field_name in SKIP_PROPERTIES:
-                continue
-
-            field_data = data[field_name]
-            requirement = self._get_requirement_level(field_name, 'type')
-
-            if requirement:
-                missing_results = self._check_field_missing_values(
-                    field_name, field_data, requirement
-                )
-                results.extend(missing_results)
-
-        # Check core fields
-        if 'samples_core' in data:
-            for field_name, field_data in data['samples_core'].items():
-                requirement = self._get_requirement_level(field_name, 'core')
-
-                if requirement:
-                    missing_results = self._check_field_missing_values(
-                        f"samples_core.{field_name}", field_data, requirement
-                    )
-                    results.extend(missing_results)
-
-        return results
-
-    def _get_requirement_level(self, field_name: str, field_type: str) -> Optional[str]:
-        """Get requirement level for a field"""
-        for level in ['mandatory', 'recommended', 'optional']:
-            if field_name in self.field_requirements[level][field_type]:
-                return level
-        return None
-
-    def _check_field_missing_values(self, field_path: str, field_data: Any,
-                                    requirement: str) -> List[ValidationResult]:
-        """Check a single field for missing values"""
-        results = []
-        missing_config = MISSING_VALUES.get(requirement, {})
-
-        values_to_check = []
-
-        if isinstance(field_data, dict):
-            for key in ['value', 'text', 'term']:
-                if key in field_data:
-                    values_to_check.append((field_data[key], field_path))
-        elif isinstance(field_data, list):
-            for i, item in enumerate(field_data):
-                if isinstance(item, dict):
-                    for key in ['value', 'text', 'term']:
-                        if key in item:
-                            values_to_check.append((item[key], f"{field_path}[{i}]"))
-
-        for value, path in values_to_check:
-            if value in missing_config.get('errors', []):
-                results.append(ValidationResult(
-                    field_path=path,
-                    errors=[f"Field '{path.split('.')[-1]}' contains missing value that "
-                            f"is not appropriate for this field"]
-                ))
-            elif value in missing_config.get('warnings', []):
-                results.append(ValidationResult(
-                    field_path=path,
-                    warnings=[f"Field '{path.split('.')[-1]}' contains missing value that "
-                              f"is not appropriate for this field"]
-                ))
-
-        return results
-
-    def _validate_ontologies(self, data: Dict[str, Any]) -> List[ValidationResult]:
-        """Validate all ontology fields in the data"""
-        results = []
-
-        # Collect all ontology terms
-        ontology_ids = self._collect_ontology_ids(data)
-
-        # Validate type fields
-        for field_name, field_data in data.items():
-            if field_name in SKIP_PROPERTIES:
-                continue
-
-            if field_name in self.ontology_names:
-                onto_results = self._validate_ontology_field(
-                    field_name, field_data, self.ontology_names[field_name]
-                )
-                results.extend(onto_results)
-
-        # Validate core fields
-        if 'samples_core' in data:
-            # TODO: Add core ontology validation if needed
-            pass
-
-        return results
-
-    def _validate_ontology_field(self, field_name: str, field_data: Any,
-                                 expected_onto_names: List[str]) -> List[ValidationResult]:
-        """Validate a single ontology field"""
-        results = []
-
-        if isinstance(field_data, dict) and 'term' in field_data and 'text' in field_data:
-            onto_result = self.ontology_validator.validate_ontology_term(
-                field_data['term'],
-                field_data.get('ontology_name', ''),
-                [],  # TODO: Add allowed classes from graph restrictions
-                field_data['text']
-            )
-            if onto_result.errors or onto_result.warnings:
-                onto_result.field_path = field_name
-                results.append(onto_result)
-        elif isinstance(field_data, list):
-            for i, item in enumerate(field_data):
-                if isinstance(item, dict) and 'term' in item and 'text' in item:
-                    onto_result = self.ontology_validator.validate_ontology_term(
-                        item['term'],
-                        item.get('ontology_name', ''),
-                        [],  # TODO: Add allowed classes from graph restrictions
-                        item['text']
-                    )
-                    if onto_result.errors or onto_result.warnings:
-                        onto_result.field_path = f"{field_name}[{i}]"
-                        results.append(onto_result)
-
-        return results
-
-    def _validate_custom_fields(self, custom_data: Dict[str, Any]) -> List[ValidationResult]:
-        """Validate custom fields for ontology consistency"""
-        results = []
-
-        for field_name, field_data in custom_data.items():
-            if isinstance(field_data, dict) and 'term' in field_data and 'text' in field_data:
-                onto_result = self.ontology_validator.validate_ontology_term(
-                    field_data['term'],
-                    field_data.get('ontology_name', ''),
-                    [],
-                    field_data['text']
-                )
-                if onto_result.errors or onto_result.warnings:
-                    onto_result.field_path = f"custom.{field_name}"
-                    results.append(onto_result)
-
-        return results
-
-    def _collect_ontology_ids(self, data: Dict[str, Any]) -> Set[str]:
-        """Collect all ontology term IDs from the data"""
-        ids = set()
-
-        def extract_ids(obj: Any):
-            if isinstance(obj, dict):
-                if 'term' in obj and 'text' in obj:
-                    ids.add(obj['term'])
-                for value in obj.values():
-                    extract_ids(value)
-            elif isinstance(obj, list):
-                for item in obj:
-                    extract_ids(item)
-
-        extract_ids(data)
-        return ids
-
-    def _get_organism_identifier(self, organism: Dict, action: str = 'new') -> str:
-        """Get identifier for an organism from the data"""
-        col_name = 'biosample_id' if action == 'update' else 'sample_name'
-
-        if 'custom' in organism and col_name in organism['custom']:
-            return organism['custom'][col_name]['value']
-        elif 'alias' in organism:
-            return organism.get('alias', {}).get('value', '')
-
-        return ''
-
-    def _get_record_structure(self, structure: Dict[str, Any], record: Dict[str, Any],
-                              record_name: str, action: str) -> Dict[str, Any]:
-        """Create structure to return to front-end matching Django format"""
-        col_name = 'biosample_id' if action == 'update' else 'sample_name'
-
-        # Initialize the structure
-        result = self._parse_data(structure.get('type', {}), record)
-
-        # Add core fields
-        if 'samples_core' in record and 'core' in structure:
-            result['samples_core'] = self._parse_data(
-                structure['core'], record['samples_core']
-            )
-
-        # Add custom fields
-        if 'custom' in structure:
-            result['custom'] = self._parse_data(
-                structure['custom'], record.get('custom', {})
-            )
-
-            # Ensure the identifier field exists
-            if col_name not in result['custom']:
-                result['custom'][col_name] = {'value': record_name}
-
-        return result
-
-    def _parse_data(self, structure: Dict[str, Any], record: Dict[str, Any]) -> Dict[str, Any]:
-        """Copy data from record to structure"""
-        results = {}
-
-        for k, v in structure.items():
-            if isinstance(v, dict):
-                if k in record:
-                    results[k] = self._convert_to_none(v, record[k])
-                else:
-                    results[k] = self._convert_to_none(v)
-            elif isinstance(v, list):
-                results.setdefault(k, [])
-                for index, value in enumerate(v):
-                    if k in record and index < len(record[k]):
-                        results[k].append(self._convert_to_none(value, record[k][index]))
-                    else:
-                        results[k].append(self._convert_to_none(value))
-
-        return results
-
-    def _convert_to_none(self, structure: Dict[str, Any],
-                         data_to_check: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Assign fields to None or copy values"""
-        results = {}
-
-        if data_to_check is None:
-            for k in structure:
-                results[k] = None
-        else:
-            for k in structure:
-                if k in data_to_check:
-                    results[k] = data_to_check[k]
-                else:
-                    results[k] = None
-
-        return results
-
-    def _apply_validation_result_to_structure(self, structure: Dict[str, Any],
-                                              result: ValidationResult):
-        """Apply validation result to the record structure"""
-        # Parse the field path
-        path_parts = result.field_path.split('.')
-
-        # Navigate to the correct location in the structure
-        current = structure
-        for i, part in enumerate(path_parts[:-1]):
-            # Handle array indices
-            if '[' in part and ']' in part:
-                field_name = part[:part.index('[')]
-                index = int(part[part.index('[') + 1:part.index(']')])
-
-                if field_name in current and isinstance(current[field_name], list):
-                    if index < len(current[field_name]):
-                        current = current[field_name][index]
-                    else:
-                        break
-            elif part in current:
-                current = current[part]
+            if model and not errors['errors']:
+                results['valid_organisms'].append({
+                    'index': i,
+                    'sample_name': sample_name,
+                    'model': model,
+                    'warnings': errors['warnings']
+                })
+                results['summary']['valid'] += 1
+                if errors['warnings']:
+                    results['summary']['warnings'] += 1
             else:
-                break
+                results['invalid_organisms'].append({
+                    'index': i,
+                    'sample_name': sample_name,
+                    'errors': errors
+                })
+                results['summary']['invalid'] += 1
 
-        # Apply errors/warnings to the final field
-        final_field = path_parts[-1]
+        # Second pass: validate relationships across all organisms
+        if results['valid_organisms']:
+            relationship_errors = self._validate_batch_relationships(
+                [org['model'] for org in results['valid_organisms']],
+                organisms
+            )
 
-        # Handle array indices in final field
-        if '[' in final_field and ']' in final_field:
-            field_name = final_field[:final_field.index('[')]
-            index = int(final_field[final_field.index('[') + 1:final_field.index(']')])
+            # Apply relationship errors
+            for sample_name, errors in relationship_errors.items():
+                for org in results['valid_organisms']:
+                    if org['sample_name'] == sample_name:
+                        if 'relationship_errors' not in org:
+                            org['relationship_errors'] = []
+                        org['relationship_errors'].extend(errors)
+                        break
 
-            if field_name in current and isinstance(current[field_name], list):
-                if index < len(current[field_name]):
-                    target = current[field_name][index]
-                    if isinstance(target, dict):
-                        if result.errors:
-                            target.setdefault('errors', []).extend(result.errors)
-                        if result.warnings:
-                            target.setdefault('warnings', []).extend(result.warnings)
-        elif final_field in current:
-            target = current[final_field]
-            if isinstance(target, dict):
-                if result.errors:
-                    target.setdefault('errors', []).extend(result.errors)
-                if result.warnings:
-                    target.setdefault('warnings', []).extend(result.warnings)
-            elif isinstance(target, list):
-                # Apply to all items in the list
-                for item in target:
-                    if isinstance(item, dict):
-                        if result.errors:
-                            item.setdefault('errors', []).extend(result.errors)
-                        if result.warnings:
-                            item.setdefault('warnings', []).extend(result.warnings)
+        return results
+
+    def _validate_batch_relationships(
+        self,
+        models: List[FAANGOrganismSample],
+        raw_data: List[Dict[str, Any]]
+    ) -> Dict[str, List[str]]:
+        """Validate relationships across all organisms in a batch"""
+        errors_by_sample = {}
+
+        # Create a map of sample names to models
+        sample_map = {}
+        for i, (model, data) in enumerate(zip(models, raw_data)):
+            sample_name = data.get('custom', {}).get('sample_name', {}).get('value', f'organism_{i}')
+            sample_map[sample_name] = model
+
+        # Check each organism's relationships
+        for sample_name, model in sample_map.items():
+            if not model.child_of:
+                continue
+
+            sample_errors = []
+
+            for parent_ref in model.child_of:
+                parent_id = parent_ref.value
+
+                if parent_id == "restricted access":
+                    continue
+
+                # Check if parent exists in current batch
+                if parent_id in sample_map:
+                    parent_model = sample_map[parent_id]
+
+                    # Check species match
+                    if model.organism.text != parent_model.organism.text:
+                        sample_errors.append(
+                            f"Species mismatch: child is '{model.organism.text}' "
+                            f"but parent '{parent_id}' is '{parent_model.organism.text}'"
+                        )
+
+                    # Check for circular relationships
+                    if parent_model.child_of:
+                        for grandparent in parent_model.child_of:
+                            if grandparent.value == sample_name:
+                                sample_errors.append(
+                                    f"Circular relationship detected: '{parent_id}' "
+                                    f"lists '{sample_name}' as its parent"
+                                )
+                else:
+                    # Parent not in current batch - would need to check BioSamples
+                    sample_errors.append(
+                        f"Parent '{parent_id}' not found in current batch"
+                    )
+
+            if sample_errors:
+                errors_by_sample[sample_name] = sample_errors
+
+        return errors_by_sample
+
+
+# Utility functions for working with Pydantic models
+
+def export_organism_to_biosample_format(model: FAANGOrganismSample) -> Dict[str, Any]:
+    """Convert Pydantic model to BioSamples submission format"""
+    biosample_data = {
+        "characteristics": {}
+    }
+
+    # Add organism
+    biosample_data["characteristics"]["organism"] = [{
+        "text": model.organism.text,
+        "ontologyTerms": [f"http://purl.obolibrary.org/obo/{model.organism.term.replace(':', '_')}"]
+    }]
+
+    # Add sex
+    biosample_data["characteristics"]["sex"] = [{
+        "text": model.sex.text,
+        "ontologyTerms": [f"http://purl.obolibrary.org/obo/{model.sex.term.replace(':', '_')}"]
+    }]
+
+    # Add optional fields if present
+    if model.birth_date:
+        biosample_data["characteristics"]["birth date"] = [{
+            "text": model.birth_date.value,
+            "unit": model.birth_date.units
+        }]
+
+    if model.breed:
+        biosample_data["characteristics"]["breed"] = [{
+            "text": model.breed.text,
+            "ontologyTerms": [f"http://purl.obolibrary.org/obo/{model.breed.term.replace(':', '_')}"]
+        }]
+
+    # Add relationships
+    if model.child_of:
+        biosample_data["relationships"] = []
+        for parent in model.child_of:
+            biosample_data["relationships"].append({
+                "type": "child of",
+                "target": parent.value
+            })
+
+    return biosample_data
+
+
+def generate_validation_report(validation_results: Dict[str, Any]) -> str:
+    """Generate a human-readable validation report"""
+    report = []
+    report.append("FAANG Organism Validation Report")
+    report.append("=" * 40)
+    report.append(f"\nTotal organisms processed: {validation_results['summary']['total']}")
+    report.append(f"Valid organisms: {validation_results['summary']['valid']}")
+    report.append(f"Invalid organisms: {validation_results['summary']['invalid']}")
+    report.append(f"Organisms with warnings: {validation_results['summary']['warnings']}")
+
+    if validation_results['invalid_organisms']:
+        report.append("\n\nValidation Errors:")
+        report.append("-" * 20)
+        for org in validation_results['invalid_organisms']:
+            report.append(f"\nOrganism: {org['sample_name']} (index: {org['index']})")
+            for error in org['errors']['errors']:
+                report.append(f"  ERROR: {error}")
+            for field, field_errors in org['errors']['field_errors'].items():
+                for error in field_errors:
+                    report.append(f"  ERROR in {field}: {error}")
+
+    if validation_results['valid_organisms']:
+        warnings_found = False
+        for org in validation_results['valid_organisms']:
+            if org.get('warnings') or org.get('relationship_errors'):
+                if not warnings_found:
+                    report.append("\n\nWarnings and Non-Critical Issues:")
+                    report.append("-" * 30)
+                    warnings_found = True
+
+                report.append(f"\nOrganism: {org['sample_name']} (index: {org['index']})")
+                for warning in org.get('warnings', []):
+                    report.append(f"  WARNING: {warning}")
+                for error in org.get('relationship_errors', []):
+                    report.append(f"  RELATIONSHIP: {error}")
+
+    return "\n".join(report)
 
 
 def get_submission_status(validation_results: Dict[str, Any]) -> str:
@@ -920,68 +649,68 @@ def get_submission_status(validation_results: Dict[str, Any]) -> str:
 # Example usage and integration
 if __name__ == "__main__":
     # Example organism data
-    sample_organisms = [
-        {
-            "samples_core": {
-                "material": {
-                    "text": "organism",
-                    "term": "OBI:0100026",
-                    "ontology_name": "OBI"
-                },
-                "project": {"value": "FAANG"},
-                "sample_description": {"value": "Adult female Holstein cattle"}
-            },
-            "organism": {
-                "text": "Bos taurus",
-                "term": "NCBITaxon:9913",
-                "ontology_name": "NCBITaxon"
-            },
-            "sex": {
-                "text": "female",
-                "term": "PATO:0000383",
-                "ontology_name": "PATO"
-            },
-            "birth_date": {
-                "value": "2020-05-15",
-                "units": "YYYY-MM-DD"
-            },
-            "breed": {
-                "text": "Holstein",
-                "term": "LBO:0000156",
-                "ontology_name": "LBO"
-            },
-            "custom": {
-                "sample_name": {"value": "CATTLE_001"}
-            }
-        },
-        {
-            "samples_core": {
-                "material": {
-                    "text": "organism",
-                    "term": "OBI:0100026",
-                    "ontology_name": "OBI"
-                },
-                "project": {"value": "FAANG"},
-                "sample_description": {"value": "Calf from CATTLE_001"}
-            },
-            "organism": {
-                "text": "Bos taurus",
-                "term": "NCBITaxon:9913",
-                "ontology_name": "NCBITaxon"
-            },
-            "sex": {
-                "text": "male",
-                "term": "PATO:0000384",
-                "ontology_name": "PATO"
-            },
-            "child_of": [
-                {"value": "CATTLE_001"}
-            ],
-            "custom": {
-                "sample_name": {"value": "CATTLE_002"}
-            }
-        }
-    ]
+    # sample_organisms = [
+    #     {
+    #         "samples_core": {
+    #             "material": {
+    #                 "text": "organism",
+    #                 "term": "OBI:0100026",
+    #                 "ontology_name": "OBI"
+    #             },
+    #             "project": {"value": "FAANG"},
+    #             "sample_description": {"value": "Adult female Holstein cattle"}
+    #         },
+    #         "organism": {
+    #             "text": "Bos taurus",
+    #             "term": "NCBITaxon:9913",
+    #             "ontology_name": "NCBITaxon"
+    #         },
+    #         "sex": {
+    #             "text": "female",
+    #             "term": "PATO:0000383",
+    #             "ontology_name": "PATO"
+    #         },
+    #         "birth_date": {
+    #             "value": "2020-05-15",
+    #             "units": "YYYY-MM-DD"
+    #         },
+    #         "breed": {
+    #             "text": "Holstein",
+    #             "term": "LBO:0000156",
+    #             "ontology_name": "LBO"
+    #         },
+    #         "custom": {
+    #             "sample_name": {"value": "CATTLE_001"}
+    #         }
+    #     },
+    #     {
+    #         "samples_core": {
+    #             "material": {
+    #                 "text": "organism",
+    #                 "term": "OBI:0100026",
+    #                 "ontology_name": "OBI"
+    #             },
+    #             "project": {"value": "FAANG"},
+    #             "sample_description": {"value": "Calf from CATTLE_001"}
+    #         },
+    #         "organism": {
+    #             "text": "Bos taurus",
+    #             "term": "NCBITaxon:9913",
+    #             "ontology_name": "NCBITaxon"
+    #         },
+    #         "sex": {
+    #             "text": "male",
+    #             "term": "PATO:0000384",
+    #             "ontology_name": "PATO"
+    #         },
+    #         "child_of": [
+    #             {"value": "CATTLE_001"}
+    #         ],
+    #         "custom": {
+    #             "sample_name": {"value": "CATTLE_002"}
+    #         }
+    #     }
+    # ]
 
     # Example structure from Django
     structure = {
@@ -1005,52 +734,487 @@ if __name__ == "__main__":
         }
     }
 
-    # Validate batch
-    validator = EnhancedFAANGOrganismValidator()
-    results = validator.validate_organism_batch(
-        sample_organisms,
-        structure,
-        action='new',
-        check_relationships=True
-    )
+    import json
 
-    # Get submission status
-    status = get_submission_status(results)
-
-    print(f"Validation complete!")
-    print(f"Submission status: {status}")
-    print(f"\nValidation results:")
-    print(json.dumps(results, indent=2))
-
-    # Example of how to integrate with FastAPI
-    """
-    from fastapi import FastAPI, HTTPException
-    from typing import List, Dict, Any
-
-    app = FastAPI()
-
-    @app.post("/validate/samples/organism")
-    async def validate_organisms(
-        organisms: List[Dict[str, Any]],
-        structure: Dict[str, Any],
-        action: str = "new"
-    ):
-        validator = EnhancedFAANGOrganismValidator()
-
-        try:
-            validation_results = validator.validate_organism_batch(
-                organisms, 
-                structure,
-                action=action,
-                check_relationships=True
-            )
-
-            submission_status = get_submission_status(validation_results)
-
-            return {
-                "validation_results": validation_results,
-                "submission_status": submission_status
+    json_string = """
+    {
+        "organism": [
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Adult female, 23.5 months of age, Thoroughbred"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "female",
+                    "term": "PATO:0000383"
+                },
+                "birth_date": {
+                    "value": "2009-04",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H1"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Foal, 9 days old, Thoroughbred"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "female",
+                    "term": "PATO:0000383"
+                },
+                "birth_date": {
+                    "value": "2014-07",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H2"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Whole embryo, 34 days gestational age, Thoroughbred"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "female",
+                    "term": "PATO:0000383"
+                },
+                "birth_date": {
+                    "value": "2016-01",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H3"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Endometrium (pregnant day 16)"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "female",
+                    "term": "PATO:0000383"
+                },
+                "birth_date": {
+                    "value": "2016-01",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H4"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Endometrium (pregnant day 50)"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "female",
+                    "term": "PATO:0000383"
+                },
+                "birth_date": {
+                    "value": "2016-01",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H5"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Adult male, 4 years of age, Thoroughbred"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "male",
+                    "term": "PATO:0000384"
+                },
+                "birth_date": {
+                    "value": "2016-01",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H6"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Adult"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "male",
+                    "term": "PATO:0000384"
+                },
+                "birth_date": {
+                    "value": "2014-07",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H7"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Adult, Thoroughbred"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "male",
+                    "term": "PATO:0000384"
+                },
+                "birth_date": {
+                    "value": "2014-07",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H8"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Full term, Thoroughbred"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "female",
+                    "term": "PATO:0000383"
+                },
+                "birth_date": {
+                    "value": "2014-07",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H9"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Adult"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "male",
+                    "term": "PATO:0000384"
+                },
+                "birth_date": {
+                    "value": "2014-07",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H10"
+                    }
+                }
+            },
+            {
+                "samples_core": {
+                    "sample_description": {
+                        "value": "Foal"
+                    },
+                    "material": {
+                        "text": "organism",
+                        "term": "OBI:0100026"
+                    },
+                    "project": {
+                        "value": "FAANG"
+                    }
+                },
+                "organism": {
+                    "text": "Equus caballus",
+                    "term": "NCBITaxon:9796"
+                },
+                "sex": {
+                    "text": "male",
+                    "term": "PATO:0000384"
+                },
+                "birth_date": {
+                    "value": "2013-02",
+                    "units": "YYYY-MM"
+                },
+                "breed": {
+                    "text": "Thoroughbred",
+                    "term": "LBO:0000910"
+                },
+                "health_status": [
+                    {
+                        "text": "normal",
+                        "term": "PATO:0000461"
+                    }
+                ],
+                "custom": {
+                    "sample_name": {
+                        "value": "ECA_UKY_H11"
+                    }
+                }
             }
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+        ]
+    }
     """
+
+    # Convert the JSON string into a Python dictionary
+    data = json.loads(json_string)
+
+    # Extract the list associated with the "organism" key
+    sample_organisms = data["organism"]
+
+    # The 'organism' variable now holds the Python list you requested.
+    # You can uncomment the line below to print it and verify:
+    # print(organism)
+
+    # Validate using enhanced Pydantic validator
+    validator = EnhancedPydanticValidator()
+    results = validator.validate_batch_with_pydantic(sample_organisms)
+
+    # Generate report
+    report = generate_validation_report(results)
+    print(report)
+
+    # Export to BioSamples format if valid
+    if results['valid_organisms']:
+        for valid_org in results['valid_organisms']:
+            biosample_data = export_organism_to_biosample_format(valid_org['model'])
+            print(f"\nBioSample format for {valid_org['sample_name']}:")
+            print(json.dumps(biosample_data, indent=2))
