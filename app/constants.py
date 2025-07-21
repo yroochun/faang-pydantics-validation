@@ -1,4 +1,3 @@
-from decouple import config
 
 root_path = '/Users/yroochun/Projects/koosum_validate'
 
@@ -69,7 +68,7 @@ ENA_ANALYSES_URL = f"{BASE_URL}/type/analyses/" \
                    f"faang_analyses_ena.metadata_rules.json"
 EVA_ANALYSES_URL = f"{BASE_URL}/module/analyses/" \
                    f"faang_analyses_eva.metadata_rules.json"
-ELIXIR_VALIDATOR_URL = config('ELIXIR_VALIDATOR_URL')
+ELIXIR_VALIDATOR_URL = "http://127.0.0.1:58853/validate"
 WS_URL = "ws://127.0.0.1:8000/ws/submission/test_task/"
 
 ALLOWED_TEMPLATES = ['samples', 'experiments', 'analyses']
