@@ -298,7 +298,7 @@ class RelationshipValidator:
                 print(f"Error fetching BioSample {sample_id}: {e}")
 
 
-class EnhancedPydanticValidator:
+class PydanticValidator:
     """Validator that primarily uses Pydantic models with JSON schema as fallback"""
 
     def __init__(self):
@@ -352,7 +352,7 @@ class EnhancedPydanticValidator:
 
         # 3. Ontology validation (if enabled)
         if validate_ontologies:
-            ontology_errors = self._validate_ontologies_enhanced(organism_model)
+            ontology_errors = self._validate_ontologies(organism_model)
             errors_dict['errors'].extend(ontology_errors)
 
         # 4. Relationship validation (if enabled)
@@ -364,7 +364,7 @@ class EnhancedPydanticValidator:
 
         return organism_model, errors_dict
 
-    def _validate_ontologies_enhanced(self, model: FAANGOrganismSample) -> List[str]:
+    def _validate_ontologies(self, model: FAANGOrganismSample) -> List[str]:
         """Enhanced ontology validation using Pydantic model data"""
         errors = []
 
@@ -416,11 +416,11 @@ class EnhancedPydanticValidator:
 
         return errors
 
-    def validate_batch_with_pydantic(
+    def validate_with_pydantic(
         self,
         organisms: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
-        """Validate a batch of organisms using Pydantic models"""
+
         results = {
             'valid_organisms': [],
             'invalid_organisms': [],
@@ -461,7 +461,7 @@ class EnhancedPydanticValidator:
 
         # Second pass: validate relationships across all organisms
         if results['valid_organisms']:
-            relationship_errors = self._validate_batch_relationships(
+            relationship_errors = self._validate_relationships(
                 [org['model'] for org in results['valid_organisms']],
                 organisms
             )
@@ -477,7 +477,7 @@ class EnhancedPydanticValidator:
 
         return results
 
-    def _validate_batch_relationships(
+    def _validate_relationships(
         self,
         models: List[FAANGOrganismSample],
         raw_data: List[Dict[str, Any]]
@@ -581,7 +581,6 @@ def export_organism_to_biosample_format(model: FAANGOrganismSample) -> Dict[str,
 
 
 def generate_validation_report(validation_results: Dict[str, Any]) -> str:
-    """Generate a human-readable validation report"""
     report = []
     report.append("FAANG Organism Validation Report")
     report.append("=" * 40)
@@ -648,93 +647,6 @@ def get_submission_status(validation_results: Dict[str, Any]) -> str:
 
 # Example usage and integration
 if __name__ == "__main__":
-    # Example organism data
-    # sample_organisms = [
-    #     {
-    #         "samples_core": {
-    #             "material": {
-    #                 "text": "organism",
-    #                 "term": "OBI:0100026",
-    #                 "ontology_name": "OBI"
-    #             },
-    #             "project": {"value": "FAANG"},
-    #             "sample_description": {"value": "Adult female Holstein cattle"}
-    #         },
-    #         "organism": {
-    #             "text": "Bos taurus",
-    #             "term": "NCBITaxon:9913",
-    #             "ontology_name": "NCBITaxon"
-    #         },
-    #         "sex": {
-    #             "text": "female",
-    #             "term": "PATO:0000383",
-    #             "ontology_name": "PATO"
-    #         },
-    #         "birth_date": {
-    #             "value": "2020-05-15",
-    #             "units": "YYYY-MM-DD"
-    #         },
-    #         "breed": {
-    #             "text": "Holstein",
-    #             "term": "LBO:0000156",
-    #             "ontology_name": "LBO"
-    #         },
-    #         "custom": {
-    #             "sample_name": {"value": "CATTLE_001"}
-    #         }
-    #     },
-    #     {
-    #         "samples_core": {
-    #             "material": {
-    #                 "text": "organism",
-    #                 "term": "OBI:0100026",
-    #                 "ontology_name": "OBI"
-    #             },
-    #             "project": {"value": "FAANG"},
-    #             "sample_description": {"value": "Calf from CATTLE_001"}
-    #         },
-    #         "organism": {
-    #             "text": "Bos taurus",
-    #             "term": "NCBITaxon:9913",
-    #             "ontology_name": "NCBITaxon"
-    #         },
-    #         "sex": {
-    #             "text": "male",
-    #             "term": "PATO:0000384",
-    #             "ontology_name": "PATO"
-    #         },
-    #         "child_of": [
-    #             {"value": "CATTLE_001"}
-    #         ],
-    #         "custom": {
-    #             "sample_name": {"value": "CATTLE_002"}
-    #         }
-    #     }
-    # ]
-
-    # Example structure from Django
-    structure = {
-        "organism": {
-            "type": {
-                "organism": {"text": None, "term": None, "ontology_name": None},
-                "sex": {"text": None, "term": None, "ontology_name": None},
-                "birth_date": {"value": None, "units": None},
-                "breed": {"text": None, "term": None, "ontology_name": None},
-                "health_status": [{"text": None, "term": None, "ontology_name": None}],
-                "child_of": [{"value": None}]
-            },
-            "core": {
-                "material": {"text": None, "term": None, "ontology_name": None},
-                "project": {"value": None},
-                "sample_description": {"value": None}
-            },
-            "custom": {
-                "sample_name": {"value": None}
-            }
-        }
-    }
-
-    import json
 
     json_string = """
     {
@@ -1196,17 +1108,11 @@ if __name__ == "__main__":
 
     # Convert the JSON string into a Python dictionary
     data = json.loads(json_string)
-
-    # Extract the list associated with the "organism" key
     sample_organisms = data["organism"]
 
-    # The 'organism' variable now holds the Python list you requested.
-    # You can uncomment the line below to print it and verify:
-    # print(organism)
-
-    # Validate using enhanced Pydantic validator
-    validator = EnhancedPydanticValidator()
-    results = validator.validate_batch_with_pydantic(sample_organisms)
+    # Validate using Pydantic validator
+    validator = PydanticValidator()
+    results = validator.validate_with_pydantic(sample_organisms)
 
     # Generate report
     report = generate_validation_report(results)
