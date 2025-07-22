@@ -1,0 +1,65 @@
+{
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "FAANG organism sample metadata schema",
+    "type": "object",
+    "required": [
+      "organism",
+      "sex"
+    ],
+    "properties": {
+      "organism": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "term": {
+            "type": "string",
+            "pattern": "^NCBITaxon:\\d+$"
+          },
+          "ontology_name": {
+            "type": "string",
+            "const": "NCBITaxon"
+          }
+        },
+        "required": [
+          "text",
+          "term"
+        ]
+      },
+      "sex": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "term": {
+            "type": "string",
+            "pattern": "^PATO:\\d+$"
+          },
+          "ontology_name": {
+            "type": "string",
+            "const": "PATO"
+          }
+        },
+        "required": [
+          "text",
+          "term"
+        ]
+      }
+    }
+  },
+  "object": {
+    "organism": {
+      "text": "Bos taurus",
+      "term": "NCBITaxon:9913",
+      "ontology_name": "NCBITaxon"
+    },
+    "sex": {
+      "text": "female",
+      "term": "PATO:0000383",
+      "ontology_name": "PATO"
+    }
+  }
+}
