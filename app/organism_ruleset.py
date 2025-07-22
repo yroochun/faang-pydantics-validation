@@ -1,6 +1,8 @@
 # dcc-metadata/master/json_schema/type/samples/faang_samples_organism.metadata_rules.json
 
 from pydantic import BaseModel, Field, validator, AnyUrl
+from ontology_validator import OntologyValidator, ValidationResult
+
 from typing import List, Optional, Union, Literal
 from enum import Enum
 import re
@@ -80,16 +82,23 @@ class Organism(BaseOntologyTerm):
     ontology_name: Literal["NCBITaxon"] = "NCBITaxon"
     term: Union[str, Literal["restricted access"]]
 
+    _ov = OntologyValidator(cache_enabled=True)
+
     @validator('term')
-    def validate_ncbi_taxon(cls, v):
+    def validate_ncbi_taxon(cls, v, values, **kwargs):
         """Validate NCBI Taxon terms"""
         if v == "restricted access":
             return v
 
-        # TODO: Validate against NCBITaxon:1 subclasses
-        # Should check that term is a subclass of NCBITaxon:1
-        # using the graph_restriction rules
-
+        # call out to OLS and enforce subclass of NCBITaxon:1
+        ont = values.get('ontology_name', "NCBITaxon")
+        res = cls._ov.validate_ontology_term(
+            term=v,
+            ontology_name=ont,
+            allowed_classes=["NCBITaxon"]  # top‐level taxon class
+        )
+        if res.errors:
+            raise ValueError(f"Organism term invalid: {res.errors}")
         return v
 
 
@@ -105,15 +114,22 @@ class Sex(BaseOntologyTerm):
     ontology_name: Literal["PATO"] = "PATO"
     term: Union[str, Literal["restricted access"]]
 
+    _ov = OntologyValidator(cache_enabled=True)
+
     @validator('term')
-    def validate_pato_sex(cls, v):
+    def validate_pato_sex(cls, v, values, **kwargs):
         """Validate PATO sex terms"""
         if v == "restricted access":
             return v
 
-        # TODO: Validate against PATO:0000047 (biological sex) subclasses
-        # Should check that term is a subclass of PATO:0000047
-
+        ont = values.get('ontology_name')
+        res = cls._ov.validate_ontology_term(
+            term=v,
+            ontology_name=ont,
+            allowed_classes=["PATO:0000047"]
+        )
+        if res.errors:
+            raise ValueError(f"Sex term invalid: {res.errors}")
         return v
 
 
@@ -148,14 +164,22 @@ class Breed(BaseOntologyTerm):
     ontology_name: Literal["LBO"] = "LBO"
     term: Union[str, Literal["not applicable", "restricted access"]]
 
+    _ov = OntologyValidator(cache_enabled=True)
+
     @validator('term')
-    def validate_lbo_breed(cls, v):
+    def validate_lbo_breed(cls, v, values, **kwargs):
         """Validate LBO breed terms"""
         if v in ["not applicable", "restricted access"]:
             return v
 
-        # TODO: Validate against LBO:0000000 subclasses
-        # Should check that term is a subclass of LBO:0000000
+        ont = values.get('ontology_name')
+        res = cls._ov.validate_ontology_term(
+            term=v,
+            ontology_name=ont,
+            allowed_classes=["LBO"]  # LBO:0000000
+        )
+        if res.errors:
+            raise ValueError(f"Breed term invalid: {res.errors}")
 
         return v
 
@@ -172,15 +196,23 @@ class HealthStatus(BaseOntologyTerm):
     ontology_name: Optional[Literal["PATO", "EFO"]] = None
     term: Union[str, Literal["not applicable", "not collected", "not provided", "restricted access"]]
 
+    _ov = OntologyValidator(cache_enabled=True)
+
     @validator('term')
-    def validate_health_status(cls, v):
+    def validate_health_status(cls, v, values, **kwargs):
         """Validate PATO or EFO health status terms"""
         if v in ["not applicable", "not collected", "not provided", "restricted access"]:
             return v
 
-        # TODO: Validate against PATO:0000461 (normal) or EFO:0000408 (disease)
-        # Should check that term is a subclass of either root class
-        # Note: include_self: true means the root classes themselves are valid
+        # determine which ontology to use (PATO or EFO)
+        ont = values.get('ontology_name', "PATO")
+        res = cls._ov.validate_ontology_term(
+            term=v,
+            ontology_name=ont,
+            allowed_classes=["PATO:0000461", "EFO:0000408"]
+        )
+        if res.errors:
+            raise ValueError(f"HealthStatus term invalid: {res.errors}")
 
         return v
 
@@ -310,6 +342,7 @@ class FAANGOrganismSample(BaseModel):
 
     class Config:
         extra = "forbid"
+        validate_all = True
         use_enum_values = True
         validate_assignment = True
 
