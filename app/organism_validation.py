@@ -13,6 +13,7 @@ import requests
 from collections import defaultdict
 import json
 from ontology_validator import OntologyValidator, ValidationResult
+from breed_species_validator import BreedSpeciesValidator
 
 
 
@@ -216,28 +217,29 @@ class PydanticValidator:
 
     def __init__(self):
         self.relationship_validator = RelationshipValidator()
-        # Only load JSON schemas if needed for specific validations
-        self.json_schema_url = None
+        self.ontology_validator = OntologyValidator(cache_enabled=True)
+        self.breed_validator = BreedSpeciesValidator(self.ontology_validator)  # Add this
+        self.schema_cache = SchemaCache()
+        self.json_schema_url = ("https://raw.githubusercontent.com/FAANG/dcc-metadata/master/json_schema/type/"
+                                "samples/faang_samples_organism.metadata_rules.json")
+        self._resolved_schema = None  # Cache for resolved schema
+
 
     def validate_organism_sample(
         self,
         data: Dict[str, Any],
         validate_relationships: bool = True,
-        validate_ontologies: bool = True
+        validate_ontologies: bool = True,
+        validate_with_json_schema: bool = True  # Add flag to control JSON schema validation
     ) -> Tuple[Optional[FAANGOrganismSample], Dict[str, List[str]]]:
-        """
-        Validate using Pydantic as primary validator
 
-        Returns:
-            Tuple of (validated_model, validation_errors_dict)
-        """
         errors_dict = {
             'errors': [],
             'warnings': [],
             'field_errors': {}
         }
 
-        # 1. Primary validation with Pydantic
+        # 1. Pydantic validation
         try:
             organism_model = FAANGOrganismSample(**data)
         except ValidationError as e:
@@ -253,9 +255,33 @@ class PydanticValidator:
 
             return None, errors_dict
 
-        # 2. Additional custom validations that Pydantic doesn't handle
+        # 2. JSON Schema validation with Elixir (if enabled)
+        if validate_with_json_schema and self.json_schema_url:
+            try:
+                # Get and resolve schema only once
+                if self._resolved_schema is None:
+                    print("Loading and resolving organism schema...")
+                    schema = self.schema_cache.get_schema(self.json_schema_url)
+                    # Resolve $ref references
+                    self._resolved_schema = self.ontology_validator.resolve_schema_refs(schema)
 
-        # Check recommended fields (these are Optional in Pydantic but recommended by FAANG)
+                # Validate with resolved schema
+                elixir_results = self.ontology_validator.validate_with_elixir(data, self._resolved_schema)
+
+                for vr in elixir_results:
+                    # vr.field_path is a JSON-pointer like "/sex/term"
+                    # strip leading slash for readability:
+                    path = vr.field_path.lstrip('/')
+                    for msg in vr.errors:
+                        errors_dict['field_errors'].setdefault(path, []).append(msg)
+                        errors_dict['errors'].append(f"{path}: {msg}")
+
+            except Exception as e:
+                print(f"JSON Schema validation error: {e}")
+                # Don't fail the entire validation if JSON schema validation fails
+                errors_dict['warnings'].append(f"JSON Schema validation skipped due to error: {e}")
+
+        # 3. Check recommended fields
         recommended_fields = ['birth_date', 'breed', 'health_status']
         for field in recommended_fields:
             if getattr(organism_model, field, None) is None:
@@ -263,12 +289,12 @@ class PydanticValidator:
                     f"Field '{field}' is recommended but was not provided"
                 )
 
-        # 3. Ontology validation (if enabled)
+        # 4. Ontology validation (if enabled)
         if validate_ontologies:
             ontology_errors = self._validate_ontologies(organism_model)
             errors_dict['errors'].extend(ontology_errors)
 
-        # 4. Relationship validation (if enabled)
+        # 5. Relationship validation (if enabled)
         if validate_relationships and hasattr(organism_model, 'child_of') and organism_model.child_of:
             rel_errors = self._validate_relationships_for_single(
                 organism_model, data.get('custom', {}).get('sample_name', {}).get('value', 'unknown')
@@ -277,7 +303,7 @@ class PydanticValidator:
 
         return organism_model, errors_dict
 
-    def _validate_ontologies(self, model: FAANGOrganismSample) -> List[str]:
+    def _validate_ontologies(self, model: FAANGOrganismSample, data: Dict[str, Any]) -> List[str]:
         """Enhanced ontology validation using Pydantic model data"""
         errors = []
 
@@ -293,10 +319,31 @@ class PydanticValidator:
             if not model.sex.term.startswith("PATO:"):
                 errors.append(f"Sex term '{model.sex.term}' should be from PATO ontology")
 
-        # Validate breed if present
-        if model.breed and model.breed.term not in ["not applicable", "restricted access"]:
-            if not model.breed.term.startswith("LBO:"):
-                errors.append(f"Breed term '{model.breed.term}' should be from LBO ontology")
+        # Validate breed against species - EXACTLY like Django
+        if model.breed and model.organism:
+            breed_errors = self.breed_validator.validate_breed_for_species(
+                model.organism.term,
+                model.breed.term
+            )
+            if breed_errors:
+                # Django adds this specific error to organism field
+                errors.append(
+                    f"Breed '{model.breed.text}' doesn't match the animal "
+                    f"specie: '{model.organism.text}'"
+                )
+
+        # Validate breed against species - EXACTLY like Django
+        if model.breed and model.organism:
+            breed_errors = self.breed_validator.validate_breed_for_species(
+                model.organism.term,
+                model.breed.term
+            )
+            if breed_errors:
+                # Django adds this specific error to organism field
+                errors.append(
+                    f"Breed '{model.breed.text}' doesn't match the animal "
+                    f"specie: '{model.organism.text}'"
+                )
 
         # Validate health status if present
         if model.health_status:
@@ -589,10 +636,6 @@ if __name__ == "__main__":
                     "value": "2009-04",
                     "units": "YYYY-MM"
                 },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
-                },
                 "health_status": [
                     {
                         "text": "normal",
@@ -629,10 +672,6 @@ if __name__ == "__main__":
                 "birth_date": {
                     "value": "2014-07",
                     "units": "YYYY-MM"
-                },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
                 },
                 "health_status": [
                     {
@@ -671,10 +710,6 @@ if __name__ == "__main__":
                     "value": "2016-01",
                     "units": "YYYY-MM"
                 },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
-                },
                 "health_status": [
                     {
                         "text": "normal",
@@ -711,10 +746,6 @@ if __name__ == "__main__":
                 "birth_date": {
                     "value": "2016-01",
                     "units": "YYYY-MM"
-                },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
                 },
                 "health_status": [
                     {
@@ -753,10 +784,6 @@ if __name__ == "__main__":
                     "value": "2016-01",
                     "units": "YYYY-MM"
                 },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
-                },
                 "health_status": [
                     {
                         "text": "normal",
@@ -793,10 +820,6 @@ if __name__ == "__main__":
                 "birth_date": {
                     "value": "2016-01",
                     "units": "YYYY-MM"
-                },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
                 },
                 "health_status": [
                     {
@@ -835,10 +858,6 @@ if __name__ == "__main__":
                     "value": "2014-07",
                     "units": "YYYY-MM"
                 },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
-                },
                 "health_status": [
                     {
                         "text": "normal",
@@ -875,10 +894,6 @@ if __name__ == "__main__":
                 "birth_date": {
                     "value": "2014-07",
                     "units": "YYYY-MM"
-                },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
                 },
                 "health_status": [
                     {
@@ -917,10 +932,6 @@ if __name__ == "__main__":
                     "value": "2014-07",
                     "units": "YYYY-MM"
                 },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
-                },
                 "health_status": [
                     {
                         "text": "normal",
@@ -958,10 +969,6 @@ if __name__ == "__main__":
                     "value": "2014-07",
                     "units": "YYYY-MM"
                 },
-                "breed": {
-                    "text": "Thoroughbred (Horse)",
-                    "term": "LBO:0000910"
-                },
                 "health_status": [
                     {
                         "text": "normal",
@@ -998,10 +1005,6 @@ if __name__ == "__main__":
                 "birth_date": {
                     "value": "2013-02",
                     "units": "YYYY-MM"
-                },
-                "breed": {
-                    "text": "Thoroughbred",
-                    "term": "LBO:0000910"
                 },
                 "health_status": [
                     {
