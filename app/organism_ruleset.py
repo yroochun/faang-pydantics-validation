@@ -53,22 +53,6 @@ class BaseOntologyTerm(BaseModel):
     term: str
     ontology_name: Optional[str] = None
 
-    @validator('term')
-    def validate_ontology_term(cls, v, values):
-        """
-        Placeholder for ontological validation.
-        In a full implementation, this would validate against the graph restrictions
-        defined in the JSON schema using an ontology service or local ontology files.
-        """
-        if v == "restricted access":
-            return v
-
-        # TODO: Implement actual ontological validation
-        # This would check against the specific graph_restriction rules
-        # defined for each ontology type
-
-        return v
-
 
 class Organism(BaseOntologyTerm):
     """
@@ -363,11 +347,6 @@ def validate_faang_organism_sample(data: dict, validate_ontology: bool = False) 
     Raises:
         ValidationError: If data doesn't conform to the schema
     """
-    if validate_ontology:
-        # TODO: Implement full ontological validation
-        # This would check each ontology term against its graph_restriction rules
-        # using an ontology service or local ontology files
-        pass
 
     try:
         return FAANGOrganismSample(**data)
