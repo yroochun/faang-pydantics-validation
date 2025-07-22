@@ -223,19 +223,19 @@ class PydanticValidator:
 
         # ontology validation
         if validate_ontologies:
-            ontology_errors = self._validate_ontologies(organism_model)
+            ontology_errors = self.validate_ontologies(organism_model)
             errors_dict['errors'].extend(ontology_errors)
 
         # relationship validation
         if validate_relationships and hasattr(organism_model, 'child_of') and organism_model.child_of:
-            rel_errors = self._validate_relationships_for_single(
+            rel_errors = self.validate_organism_relationships(
                 organism_model, data.get('custom', {}).get('sample_name', {}).get('value', 'unknown')
             )
             errors_dict['errors'].extend(rel_errors)
 
         return organism_model, errors_dict
 
-    def _validate_ontologies(self, model: FAANGOrganismSample) -> List[str]:
+    def validate_ontologies(self, model: FAANGOrganismSample) -> List[str]:
         errors = []
 
         if model.organism.term != "restricted access":
@@ -264,7 +264,7 @@ class PydanticValidator:
 
         return errors
 
-    def _validate_relationships_for_single(
+    def validate_organism_relationships(
         self,
         model: FAANGOrganismSample,
         sample_name: str
@@ -436,10 +436,8 @@ def export_organism_to_biosample_format(model: FAANGOrganismSample) -> Dict[str,
     return biosample_data
 
 
-def generate_validation_report(validation_results: Dict[str, Any]) -> str:
+def generate_report(validation_results: Dict[str, Any]) -> str:
     report = []
-    report.append("FAANG Organism Validation Report")
-    report.append("=" * 40)
     report.append(f"\nTotal organisms processed: {validation_results['summary']['total']}")
     report.append(f"Valid organisms: {validation_results['summary']['valid']}")
     report.append(f"Invalid organisms: {validation_results['summary']['invalid']}")
@@ -964,7 +962,7 @@ if __name__ == "__main__":
     validator = PydanticValidator()
     results = validator.validate_with_pydantic(sample_organisms)
 
-    report = generate_validation_report(results)
+    report = generate_report(results)
     print(report)
 
     if results['valid_organisms']:
