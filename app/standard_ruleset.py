@@ -104,12 +104,7 @@ class SampleCoreMetadata(BaseModel):
     # optional fields
     describedBy: Optional[
         Literal["https://github.com/FAANG/faang-metadata/blob/master/docs/faang_sample_metadata.md"]] = None
-    schema_version: Optional[str] = Field(
-        None,
-        regex=r"^[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}$",
-        description="The version number of the schema in major.minor.patch format",
-        example="4.6.1"
-    )
+
     sample_description: Optional[SampleDescription] = Field(
         None,
         description="Optional: A brief description of the sample including species name"
