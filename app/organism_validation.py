@@ -231,6 +231,10 @@ class PydanticValidator:
                 errors_dict['errors'].append(f"{field_path}: {error_msg}")
 
             return None, errors_dict
+        except Exception as e:
+            # Handle any other validation errors
+            errors_dict['errors'].append(str(e))
+            return None, errors_dict
 
         # elixir validation
         if validate_with_json_schema and self.json_schema_url:
@@ -462,6 +466,11 @@ def export_organism_to_biosample_format(model: FAANGOrganismSample) -> Dict[str,
         "characteristics": {}
     }
 
+    biosample_data["characteristics"]["material"] = [{
+        "text": model.material.text,
+        "ontologyTerms": [f"http://purl.obolibrary.org/obo/{model.material.term.replace(':', '_')}"]
+    }]
+
     biosample_data["characteristics"]["organism"] = [{
         "text": model.organism.text,
         "ontologyTerms": [f"http://purl.obolibrary.org/obo/{model.organism.term.replace(':', '_')}"]
@@ -509,8 +518,8 @@ def generate_validation_report(validation_results: Dict[str, Any]) -> str:
         report.append("-" * 20)
         for org in validation_results['invalid_organisms']:
             report.append(f"\nOrganism: {org['sample_name']} (index: {org['index']})")
-            for error in org['errors']['errors']:
-                report.append(f"  ERROR: {error}")
+            # for error in org['errors']['errors']:
+            #     report.append(f"  ERROR: {error}")
             for field, field_errors in org['errors']['field_errors'].items():
                 for error in field_errors:
                     report.append(f"  ERROR in {field}: {error}")
@@ -606,7 +615,7 @@ if __name__ == "__main__":
                     },
                     "material": {
                         "text": "organism",
-                        "term": "OBI:0100026cc"
+                        "term": "OBI:0100026"
                     },
                     "project": {
                         "value": "FAANG"
