@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, validator, root_validator, ValidationError
-from typing import List, Optional, Union, Dict, Any, Tuple, Set
+from pydantic import BaseModel, Field, ValidationError
+from typing import List, Optional, Dict, Any, Tuple
 import requests
 import json
 from ontology_validator import OntologyValidator, ValidationResult
@@ -11,7 +11,6 @@ from organism_ruleset import (
 
 from constants import (
 ALLOWED_RELATIONSHIPS,
-
 )
 
 
@@ -23,7 +22,6 @@ class ValidationDocument(BaseModel):
 
 # cache json schema
 class SchemaCache:
-
     def __init__(self):
         self._cache: Dict[str, Any] = {}
 
@@ -41,9 +39,7 @@ class SchemaCache:
 
 
 
-
 class RelationshipValidator:
-
     def __init__(self):
         self.biosamples_cache: Dict[str, Dict] = {}
 
@@ -71,7 +67,7 @@ class RelationshipValidator:
         if biosample_ids:
             self.fetch_biosample_data(list(biosample_ids))
 
-        # check organism relationships
+        # organism relationships
         for org in organisms:
             name = self.get_organism_identifier(org, action)
             result = ValidationResult(field_path=f"organism.{name}.child_of")
@@ -93,7 +89,7 @@ class RelationshipValidator:
                     )
                     continue
 
-                # get parent data
+                # parent data
                 if parent_id in organism_map:
                     parent_data = organism_map[parent_id]
                     parent_species = parent_data.get('organism', {}).get('text', '')
@@ -181,7 +177,6 @@ class RelationshipValidator:
 
 
 class PydanticValidator:
-
     def __init__(self):
         self.relationship_validator = RelationshipValidator()
         self.ontology_validator = OntologyValidator(cache_enabled=True)
@@ -208,13 +203,10 @@ class PydanticValidator:
 
         # pydantic validation
         try:
-            # Create a copy for Pydantic validation to avoid modifying original
             pydantic_data = data.copy()
-
-            # If data has nested samples_core, flatten it for Pydantic
+            # if data has nested samples_core, flatten it for pydantic
             if 'samples_core' in pydantic_data:
                 samples_core = pydantic_data.pop('samples_core')
-                # Merge samples_core fields into main data
                 for key, value in samples_core.items():
                     if key not in pydantic_data:
                         pydantic_data[key] = value
@@ -232,7 +224,6 @@ class PydanticValidator:
 
             return None, errors_dict
         except Exception as e:
-            # Handle any other validation errors
             errors_dict['errors'].append(str(e))
             return None, errors_dict
 
@@ -242,7 +233,6 @@ class PydanticValidator:
                 if self._resolved_schema is None:
                     print("Loading and resolving organism schema...")
                     schema = self.schema_cache.get_schema(self.json_schema_url)
-                    # resolve $ref references
                     self._resolved_schema = self.ontology_validator.resolve_schema_refs(schema)
 
                 elixir_results = self.ontology_validator.validate_with_elixir(data, self._resolved_schema)
@@ -360,7 +350,7 @@ class PydanticValidator:
             }
         }
 
-        # validate each organism
+        # validate organisms
         for i, org_data in enumerate(organisms):
             sample_name = org_data.get('custom', {}).get('sample_name', {}).get('value', f'organism_{i}')
 
@@ -417,7 +407,7 @@ class PydanticValidator:
             sample_name = data.get('custom', {}).get('sample_name', {}).get('value', f'organism_{i}')
             sample_map[sample_name] = model
 
-        # Check organism relationships
+        # organism relationships
         for sample_name, model in sample_map.items():
             if not model.child_of:
                 continue
@@ -430,7 +420,6 @@ class PydanticValidator:
                 if parent_id == "restricted access":
                     continue
 
-                # check if parent exists
                 if parent_id in sample_map:
                     parent_model = sample_map[parent_id]
 
