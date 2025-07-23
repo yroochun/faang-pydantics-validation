@@ -264,7 +264,7 @@ class PydanticValidator:
 
         return organism_model, errors_dict
 
-    def validate_ontologies(self, model: FAANGOrganismSample, data: Dict[str, Any]) -> List[str]:
+    def validate_ontologies(self, model: FAANGOrganismSample) -> List[str]:
         errors = []
 
         if model.organism.term != "restricted access":
