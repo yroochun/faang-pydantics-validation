@@ -42,6 +42,7 @@ DeliveryEase = Literal[
     "veterinarian assisted"
 ]
 
+
 # Base ontology term model with graph restriction validation placeholder
 class BaseOntologyTerm(BaseModel):
     """Base model for ontology terms with validation placeholders"""
@@ -196,6 +197,7 @@ class HealthStatus(BaseOntologyTerm):
 
         return v
 
+
 class Diet(BaseModel):
     """Organism diet summary, more detailed information will be recorded in the associated protocols.
     Particuarly important for projects with controlled diet treatements.
@@ -261,36 +263,33 @@ class ChildOf(BaseModel):
 class SampleName(BaseModel):
     value: str
 
+
 class Custom(BaseModel):
     sample_name: SampleName
 
-class FAANGOrganismSample(BaseModel):
+
+class FAANGOrganismSample(SampleCoreMetadata):
     """FAANG organism sample metadata model
 
-    Field requirement levels:
-    - REQUIRED: samples_core, organism, sex
+    Now inherits from SampleCoreMetadata, which provides:
+    - material (REQUIRED)
+    - project (REQUIRED)
+    - describedBy (OPTIONAL)
+    - schema_version (OPTIONAL)
+    - sample_description (OPTIONAL)
+    - availability (OPTIONAL)
+    - same_as (OPTIONAL)
+    - secondary_project (OPTIONAL)
+
+    Additional field requirement levels:
+    - REQUIRED: organism, sex
     - RECOMMENDED: birth_date, breed, health_status
     - OPTIONAL: all other fields
     """
 
-    # REQUIRED fields
-    samples_core: SampleCoreMetadata = Field(
-        ...,
-        description="Core samples-level information."
-    )
+    # REQUIRED fields specific to organism samples
     organism: Organism = Field(..., description="NCBI taxon ID of organism.")
     sex: Sex = Field(..., description="Animal sex, described using any child term of PATO_0000047.")
-
-    # Schema metadata
-    describedBy: Optional[str] = Field(
-        default="https://github.com/FAANG/faang-metadata/blob/master/docs/faang_sample_metadata.md",
-        const=True
-    )
-    schema_version: Optional[str] = Field(
-        default=None,
-        regex=r'^[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}$',
-        description="The version number of the schema in major.minor.patch format"
-    )
 
     # RECOMMENDED fields - Optional but encouraged
     birth_date: Optional[BirthDate] = Field(None, description="Birth date, in the format YYYY-MM-DD, or YYYY-MM where "
@@ -300,9 +299,10 @@ class FAANGOrganismSample(BaseModel):
                                                      "guidelines (http://bit.ly/FAANGbreed). Should be considered "
                                                      "mandatory for terrestiral species, for aquatic species "
                                                      "record 'not applicable'.")
-    health_status: Optional[List[HealthStatus]] = Field(None, description="Healthy animals should have the term normal, "
-                                                                          "otherwise use the as many disease terms as "
-                                                                          "necessary from EFO.")
+    health_status: Optional[List[HealthStatus]] = Field(None,
+                                                        description="Healthy animals should have the term normal, "
+                                                                    "otherwise use the as many disease terms as "
+                                                                    "necessary from EFO.")
 
     # OPTIONAL fields
     diet: Optional[Diet] = None
@@ -323,7 +323,6 @@ class FAANGOrganismSample(BaseModel):
     class Config:
         extra = "forbid"
         validate_all = True
-        # No longer need use_enum_values = True with Literals
         validate_assignment = True
 
 
@@ -342,6 +341,15 @@ def validate_faang_organism_sample(data: dict, validate_ontology: bool = False) 
     Raises:
         ValidationError: If data doesn't conform to the schema
     """
+
+    # Extract samples_core data if provided separately
+    if 'samples_core' in data:
+        # Merge samples_core fields into the main data dict
+        samples_core = data.pop('samples_core')
+        # Add each field from samples_core to the main data
+        for key, value in samples_core.items():
+            if key not in data:  # Don't overwrite if already present at top level
+                data[key] = value
 
     try:
         return FAANGOrganismSample(**data)
@@ -391,8 +399,8 @@ def get_ontology_requirements() -> dict:
 
 # Example usage
 if __name__ == "__main__":
-    # This example works but doesn't perform full ontological validation
-    sample_data = {
+    # Example 1: With samples_core as a nested field (backward compatible)
+    sample_data_nested = {
         "samples_core": {
             "material": {
                 "text": "organism",
@@ -405,20 +413,50 @@ if __name__ == "__main__":
         },
         "organism": {
             "text": "Bos taurus",
-            "term": "NCBITaxon:9913",  # This should be validated against NCBITaxon:1 subclasses
+            "term": "NCBITaxon:9913",
             "ontology_name": "NCBITaxon"
         },
         "sex": {
             "text": "female",
-            "term": "PATO:0000383",  # This should be validated against PATO:0000047 subclasses
+            "term": "PATO:0000383",
+            "ontology_name": "PATO"
+        }
+    }
+
+    # Example 2: With fields at the top level (cleaner structure)
+    sample_data_flat = {
+        "material": {
+            "text": "organism",
+            "term": "OBI:0100026",
+            "ontology_name": "OBI"
+        },
+        "project": {"value": "FAANG"},
+        "sample_description": {"value": "Adult female Holstein cattle"},
+        "schema_version": "4.6.1",
+        "organism": {
+            "text": "Bos taurus",
+            "term": "NCBITaxon:9913",
+            "ontology_name": "NCBITaxon"
+        },
+        "sex": {
+            "text": "female",
+            "term": "PATO:0000383",
             "ontology_name": "PATO"
         }
     }
 
     try:
-        sample = validate_faang_organism_sample(sample_data)
-        print("✓ Basic validation passed")
-        print("⚠ Note: Full ontological validation not implemented")
+        # Test nested structure
+        print("Testing nested structure...")
+        sample1 = validate_faang_organism_sample(sample_data_nested)
+        print("✓ Nested structure validation passed")
+
+        # Test flat structure
+        print("\nTesting flat structure...")
+        sample2 = validate_faang_organism_sample(sample_data_flat)
+        print("✓ Flat structure validation passed")
+
+        print("\n⚠ Note: Full ontological validation not implemented")
         print("\nOntology requirements:")
         for field, reqs in get_ontology_requirements().items():
             print(f"  {field}: {reqs}")

@@ -208,7 +208,18 @@ class PydanticValidator:
 
         # pydantic validation
         try:
-            organism_model = FAANGOrganismSample(**data)
+            # Create a copy for Pydantic validation to avoid modifying original
+            pydantic_data = data.copy()
+
+            # If data has nested samples_core, flatten it for Pydantic
+            if 'samples_core' in pydantic_data:
+                samples_core = pydantic_data.pop('samples_core')
+                # Merge samples_core fields into main data
+                for key, value in samples_core.items():
+                    if key not in pydantic_data:
+                        pydantic_data[key] = value
+
+            organism_model = FAANGOrganismSample(**pydantic_data)
         except ValidationError as e:
             for error in e.errors():
                 field_path = '.'.join(str(x) for x in error['loc'])
@@ -595,7 +606,7 @@ if __name__ == "__main__":
                     },
                     "material": {
                         "text": "organism",
-                        "term": "OBI:0100026"
+                        "term": "OBI:0100026cc"
                     },
                     "project": {
                         "value": "FAANG"
