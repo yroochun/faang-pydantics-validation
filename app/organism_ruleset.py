@@ -4,47 +4,43 @@ from pydantic import BaseModel, Field, validator, AnyUrl
 from ontology_validator import OntologyValidator, ValidationResult
 
 from typing import List, Optional, Union, Literal
-from enum import Enum
 import re
 
 from standard_ruleset import SampleCoreMetadata
 
+# Replace Enums with Literal types
+DateUnits = Literal[
+    "YYYY-MM-DD",
+    "YYYY-MM",
+    "YYYY",
+    "not applicable",
+    "not collected",
+    "not provided",
+    "restricted access"
+]
 
-class DateUnits(str, Enum):
-    YYYY_MM_DD = "YYYY-MM-DD"
-    YYYY_MM = "YYYY-MM"
-    YYYY = "YYYY"
-    NOT_APPLICABLE = "not applicable"
-    NOT_COLLECTED = "not collected"
-    NOT_PROVIDED = "not provided"
-    RESTRICTED_ACCESS = "restricted access"
+WeightUnits = Literal["kilograms", "grams"]
 
+TimeUnits = Literal[
+    "days",
+    "weeks",
+    "months",
+    "day",
+    "week",
+    "month"
+]
 
-class WeightUnits(str, Enum):
-    KILOGRAMS = "kilograms"
-    GRAMS = "grams"
+DeliveryTiming = Literal[
+    "early parturition",
+    "full-term parturition",
+    "delayed parturition"
+]
 
-
-class TimeUnits(str, Enum):
-    DAYS = "days"
-    WEEKS = "weeks"
-    MONTHS = "months"
-    DAY = "day"
-    WEEK = "week"
-    MONTH = "month"
-
-
-class DeliveryTiming(str, Enum):
-    EARLY_PARTURITION = "early parturition"
-    FULL_TERM_PARTURITION = "full-term parturition"
-    DELAYED_PARTURITION = "delayed parturition"
-
-
-class DeliveryEase(str, Enum):
-    NORMAL_AUTONOMOUS_DELIVERY = "normal autonomous delivery"
-    C_SECTION = "c-section"
-    VETERINARIAN_ASSISTED = "veterinarian assisted"
-
+DeliveryEase = Literal[
+    "normal autonomous delivery",
+    "c-section",
+    "veterinarian assisted"
+]
 
 # Base ontology term model with graph restriction validation placeholder
 class BaseOntologyTerm(BaseModel):
@@ -327,12 +323,11 @@ class FAANGOrganismSample(BaseModel):
     class Config:
         extra = "forbid"
         validate_all = True
-        use_enum_values = True
+        # No longer need use_enum_values = True with Literals
         validate_assignment = True
 
 
 # Validation function for organism samples
-# Enhanced validation function with graph restriction checking
 def validate_faang_organism_sample(data: dict, validate_ontology: bool = False) -> FAANGOrganismSample:
     """
     Validate FAANG organism sample data against the Pydantic model
@@ -394,7 +389,7 @@ def get_ontology_requirements() -> dict:
     }
 
 
-# Example usage showing the limitations
+# Example usage
 if __name__ == "__main__":
     # This example works but doesn't perform full ontological validation
     sample_data = {
