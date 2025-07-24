@@ -232,13 +232,6 @@ class PydanticValidator:
             ontology_errors = self.validate_ontologies(organism_model)
             errors_dict['errors'].extend(ontology_errors)
 
-        # relationship validation
-        if validate_relationships and hasattr(organism_model, 'child_of') and organism_model.child_of:
-            rel_errors = self.validate_organism_relationships(
-                organism_model, data.get('custom', {}).get('sample_name', {}).get('value', 'unknown')
-            )
-            errors_dict['errors'].extend(rel_errors)
-
         return organism_model, errors_dict
 
     def validate_ontologies(self, model: FAANGOrganismSample) -> List[str]:
@@ -291,7 +284,6 @@ class PydanticValidator:
         model: FAANGOrganismSample,
         sample_name: str
     ) -> List[str]:
-        """Validate relationships for a single organism"""
         errors = []
 
         if not model.child_of:
@@ -385,6 +377,9 @@ class PydanticValidator:
                 continue
 
             sample_errors = []
+
+            if len(model.child_of) > 2:
+                sample_errors.append(f"Organism can have at most 2 parents, found {len(model.child_of)}")
 
             for parent_ref in model.child_of:
                 parent_id = parent_ref.value
