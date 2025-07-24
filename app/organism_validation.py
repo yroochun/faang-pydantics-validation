@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ValidationError
 from typing import List, Optional, Dict, Any, Tuple
+import requests
 import json
 from ontology_validator import OntologyValidator, ValidationResult
 from breed_species_validator import BreedSpeciesValidator
@@ -182,16 +183,6 @@ class PydanticValidator:
 
         # pydantic validation
         try:
-            # pydantic_data = data.copy()
-            # # if data has nested samples_core, flatten it for pydantic
-            # if 'samples_core' in pydantic_data:
-            #     samples_core = pydantic_data.pop('samples_core')
-            #     for key, value in samples_core.items():
-            #         if key not in pydantic_data:
-            #             pydantic_data[key] = value
-            #
-            # organism_model = FAANGOrganismSample(**pydantic_data)
-
             organism_model = FAANGOrganismSample(**data)
         except ValidationError as e:
             for error in e.errors():
@@ -243,7 +234,7 @@ class PydanticValidator:
 
         # relationship validation
         if validate_relationships and hasattr(organism_model, 'child_of') and organism_model.child_of:
-            rel_errors = self._validate_relationships_for_single(
+            rel_errors = self.validate_organism_relationships(
                 organism_model, data.get('custom', {}).get('sample_name', {}).get('value', 'unknown')
             )
             errors_dict['errors'].extend(rel_errors)
@@ -295,7 +286,7 @@ class PydanticValidator:
 
         return errors
 
-    def _validate_relationships_for_single(
+    def validate_organism_relationships(
         self,
         model: FAANGOrganismSample,
         sample_name: str
