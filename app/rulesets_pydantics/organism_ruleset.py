@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field, validator, AnyUrl
-from organism_validator_classes import OntologyValidator, ValidationResult
+from ..organism_validator_classes import OntologyValidator
 from typing import List, Optional, Union, Literal
 import re
 
-from standard_ruleset import SampleCoreMetadata
+from app.rulesets_pydantics.standard_ruleset import SampleCoreMetadata
 
 DateUnits = Literal[
     "YYYY-MM-DD",
