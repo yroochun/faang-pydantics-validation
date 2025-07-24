@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 import requests
 
-from constants import ELIXIR_VALIDATOR_URL
+from constants import ELIXIR_VALIDATOR_URL, SPECIES_BREED_LINKS, ALLOWED_RELATIONSHIPS
 
 
 class ValidationResult(BaseModel):
@@ -106,3 +106,172 @@ class OntologyValidator:
             print(f"Error using Elixir validator: {e}")
 
         return results
+
+class BreedSpeciesValidator:
+
+    def __init__(self, ontology_validator):
+        self.ontology_validator = ontology_validator
+
+    def validate_breed_for_species(self, organism_term: str, breed_term: str) -> List[str]:
+        errors = []
+
+        if organism_term not in SPECIES_BREED_LINKS:
+            errors.append(f"Organism '{organism_term}' has no defined breed links.")
+            return errors
+
+        if breed_term in ["not applicable", "restricted access"]:
+            return errors
+
+        breed_schema = {
+            "type": "string",
+            "graph_restriction": {
+                "ontologies": ["obo:lbo"],
+                "classes": [SPECIES_BREED_LINKS[organism_term]],
+                "relations": ["rdfs:subClassOf"],
+                "direct": False,
+                "include_self": True
+            }
+        }
+
+        validation_results = self.ontology_validator.validate_with_elixir(breed_term, breed_schema)
+
+        if validation_results:
+            errors.append("Breed doesn't match the animal species")
+
+        return errors
+
+class RelationshipValidator:
+    def __init__(self):
+        self.biosamples_cache: Dict[str, Dict] = {}
+
+    def validate_relationships(self,
+                               organisms: List[Dict[str, Any]],
+                               action: str = 'new') -> Dict[str, ValidationResult]:
+        results = {}
+
+        organism_map = {}
+        for org in organisms:
+            name = self.get_organism_identifier(org, action)
+            organism_map[name] = org
+
+        # BioSamples
+        biosample_ids = set()
+        for org in organisms:
+            child_of = org.get('child_of', [])
+            if isinstance(child_of, dict):
+                child_of = [child_of]
+            for parent in child_of:
+                parent_id = parent.get('value', '')
+                if parent_id.startswith('SAM'):
+                    biosample_ids.add(parent_id)
+
+        if biosample_ids:
+            self.fetch_biosample_data(list(biosample_ids))
+
+        # organism relationships
+        for org in organisms:
+            name = self.get_organism_identifier(org, action)
+            result = ValidationResult(field_path=f"organism.{name}.child_of")
+
+            child_of = org.get('child_of', [])
+            if isinstance(child_of, dict):
+                child_of = [child_of]
+
+            for parent_ref in child_of:
+                parent_id = parent_ref.get('value', '')
+
+                if parent_id == 'restricted access':
+                    continue
+
+                # check if parent exists
+                if parent_id not in organism_map and parent_id not in self.biosamples_cache:
+                    result.errors.append(
+                        f"Relationships part: no entity '{parent_id}' found"
+                    )
+                    continue
+
+                # parent data
+                if parent_id in organism_map:
+                    parent_data = organism_map[parent_id]
+                    parent_species = parent_data.get('organism', {}).get('text', '')
+                    parent_material = 'organism'
+                else:
+                    parent_data = self.biosamples_cache.get(parent_id, {})
+                    parent_species = parent_data.get('organism', '')
+                    parent_material = parent_data.get('material', '').lower()
+
+                # species match
+                current_species = org.get('organism', {}).get('text', '')
+
+                if current_species and parent_species and current_species != parent_species:
+                    result.errors.append(
+                        f"Relationships part: the specie of the child '{current_species}' "
+                        f"doesn't match the specie of the parent '{parent_species}'"
+                    )
+
+                # material type
+                allowed_materials = ALLOWED_RELATIONSHIPS.get('organism', [])
+                if parent_material and parent_material not in allowed_materials:
+                    result.errors.append(
+                        f"Relationships part: referenced entity '{parent_id}' "
+                        f"does not match condition 'should be {' or '.join(allowed_materials)}'"
+                    )
+
+                # circular relationships
+                if parent_id in organism_map:
+                    parent_relationships = parent_data.get('child_of', [])
+                    if isinstance(parent_relationships, dict):
+                        parent_relationships = [parent_relationships]
+
+                    for grandparent in parent_relationships:
+                        if grandparent.get('value') == name:
+                            result.errors.append(
+                                f"Relationships part: parent '{parent_id}' "
+                                f"is listing the child as its parent"
+                            )
+
+            if result.errors or result.warnings:
+                results[name] = result
+
+        return results
+
+    def get_organism_identifier(self, organism: Dict, action: str = 'new') -> str:
+        col_name = 'biosample_id' if action == 'update' else 'sample_name'
+
+        if 'custom' in organism and col_name in organism['custom']:
+            return organism['custom'][col_name]['value']
+        elif 'alias' in organism:
+            return organism.get('alias', {}).get('value', 'unknown')
+
+        return 'unknown'
+
+    def fetch_biosample_data(self, biosample_ids: List[str]):
+        for sample_id in biosample_ids:
+            if sample_id in self.biosamples_cache:
+                continue
+
+            try:
+                url = f"https://www.ebi.ac.uk/biosamples/samples/{sample_id}"
+                response = requests.get(url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+
+                    cache_entry = {}
+
+                    characteristics = data.get('characteristics', {})
+                    if 'organism' in characteristics:
+                        cache_entry['organism'] = characteristics['organism'][0].get('text', '')
+
+                    if 'material' in characteristics:
+                        cache_entry['material'] = characteristics['material'][0].get('text', '')
+
+                    # relationships
+                    relationships = []
+                    for rel in data.get('relationships', []):
+                        if rel['source'] == sample_id and rel['type'] in ['child of', 'derived from']:
+                            relationships.append(rel['target'])
+                    cache_entry['relationships'] = relationships
+
+                    self.biosamples_cache[sample_id] = cache_entry
+            except Exception as e:
+                print(f"Error fetching BioSample {sample_id}: {e}")
