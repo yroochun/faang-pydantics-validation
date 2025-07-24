@@ -1,18 +1,11 @@
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import ValidationError
 from typing import List, Optional, Dict, Any, Tuple
-import requests
 import json
-from ontology_validator import OntologyValidator, ValidationResult, BreedSpeciesValidator, RelationshipValidator
+from ontology_validator import OntologyValidator, BreedSpeciesValidator, RelationshipValidator
 
 from organism_ruleset import (
     FAANGOrganismSample
 )
-
-
-
-
-
-
 
 class PydanticValidator:
     def __init__(self, schema_file_path: str = None):
@@ -270,8 +263,6 @@ class PydanticValidator:
                 errors_by_sample[sample_name] = sample_errors
 
         return errors_by_sample
-
-
 
 def export_organism_to_biosample_format(model: FAANGOrganismSample) -> Dict[str, Any]:
     biosample_data = {
