@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field, ValidationError
 from typing import List, Optional, Dict, Any, Tuple
-import requests
 import json
 from ontology_validator import OntologyValidator, ValidationResult
 from breed_species_validator import BreedSpeciesValidator
@@ -19,24 +18,6 @@ class ValidationDocument(BaseModel):
 
     class Config:
         extra = "allow"
-
-# cache json schema
-class SchemaCache:
-    def __init__(self):
-        self._cache: Dict[str, Any] = {}
-
-    def get_schema(self, url: str) -> Dict[str, Any]:
-        if url not in self._cache:
-            try:
-                response = requests.get(url, timeout=30)
-                response.raise_for_status()
-                self._cache[url] = response.json()
-            except Exception as e:
-                print(f"Error fetching schema from {url}: {e}")
-                return {}
-        return self._cache[url]
-
-
 
 
 class RelationshipValidator:
@@ -177,14 +158,12 @@ class RelationshipValidator:
 
 
 class PydanticValidator:
-    def __init__(self):
+    def __init__(self, schema_file_path: str = None):
         self.relationship_validator = RelationshipValidator()
         self.ontology_validator = OntologyValidator(cache_enabled=True)
         self.breed_validator = BreedSpeciesValidator(self.ontology_validator)
-        self.schema_cache = SchemaCache()
-        self.json_schema_url = ("https://raw.githubusercontent.com/FAANG/dcc-metadata/master/json_schema/type/"
-                                "samples/faang_samples_organism.metadata_rules.json")
-        self._resolved_schema = None
+        self.schema_file_path = schema_file_path or "faang_samples_organism.metadata_rules.json"
+        self._schema = None
 
 
     def validate_organism_sample(
@@ -230,14 +209,14 @@ class PydanticValidator:
             return None, errors_dict
 
         # elixir validation
-        if validate_with_json_schema and self.json_schema_url:
+        if validate_with_json_schema:
             try:
-                if self._resolved_schema is None:
-                    print("Loading and resolving organism schema...")
-                    schema = self.schema_cache.get_schema(self.json_schema_url)
-                    self._resolved_schema = self.ontology_validator.resolve_schema_refs(schema)
+                if self._schema is None:
+                    print("Loading organism schema...")
+                    with open(self.schema_file_path, 'r') as f:
+                        self._schema = json.load(f)
 
-                elixir_results = self.ontology_validator.validate_with_elixir(data, self._resolved_schema)
+                elixir_results = self.ontology_validator.validate_with_elixir(data, self._schema)
 
                 for vr in elixir_results:
                     path = vr.field_path.lstrip('/')
@@ -954,7 +933,7 @@ if __name__ == "__main__":
     data = json.loads(json_string)
     sample_organisms = data["organism"]
 
-    validator = PydanticValidator()
+    validator = PydanticValidator("../rulesets-json/faang_samples_organism.metadata_rules.json")
     results = validator.validate_with_pydantic(sample_organisms)
 
     report = generate_validation_report(results)
