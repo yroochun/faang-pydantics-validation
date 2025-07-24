@@ -11,7 +11,6 @@ class ValidationResult(BaseModel):
     field_path: str
     value: Any = None
 
-
 class OntologyValidator:
     def __init__(self, cache_enabled: bool = True):
         self.cache_enabled = cache_enabled
