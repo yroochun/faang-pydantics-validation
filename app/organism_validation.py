@@ -203,15 +203,17 @@ class PydanticValidator:
 
         # pydantic validation
         try:
-            pydantic_data = data.copy()
-            # if data has nested samples_core, flatten it for pydantic
-            if 'samples_core' in pydantic_data:
-                samples_core = pydantic_data.pop('samples_core')
-                for key, value in samples_core.items():
-                    if key not in pydantic_data:
-                        pydantic_data[key] = value
+            # pydantic_data = data.copy()
+            # # if data has nested samples_core, flatten it for pydantic
+            # if 'samples_core' in pydantic_data:
+            #     samples_core = pydantic_data.pop('samples_core')
+            #     for key, value in samples_core.items():
+            #         if key not in pydantic_data:
+            #             pydantic_data[key] = value
+            #
+            # organism_model = FAANGOrganismSample(**pydantic_data)
 
-            organism_model = FAANGOrganismSample(**pydantic_data)
+            organism_model = FAANGOrganismSample(**data)
         except ValidationError as e:
             for error in e.errors():
                 field_path = '.'.join(str(x) for x in error['loc'])
@@ -561,17 +563,15 @@ if __name__ == "__main__":
     {
         "organism": [
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Adult female, 23.5 months of age, Thoroughbred"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Adult female, 23.5 months of age, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -598,17 +598,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Foal, 9 days old, Thoroughbred"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Foal, 9 days old, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -635,17 +633,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Whole embryo, 34 days gestational age, Thoroughbred"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Whole embryo, 34 days gestational age, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -672,17 +668,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Endometrium (pregnant day 16)"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Endometrium (pregnant day 16)"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -709,17 +703,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Endometrium (pregnant day 50)"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Endometrium (pregnant day 50)"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -746,17 +738,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Adult male, 4 years of age, Thoroughbred"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Adult male, 4 years of age, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -783,17 +773,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Adult"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Adult"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -820,17 +808,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Adult, Thoroughbred"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Adult, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -857,17 +843,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Full term, Thoroughbred"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Full term, Thoroughbred"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -894,17 +878,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Adult"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Adult"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
@@ -931,17 +913,15 @@ if __name__ == "__main__":
                 }
             },
             {
-                "samples_core": {
-                    "sample_description": {
-                        "value": "Foal"
-                    },
-                    "material": {
-                        "text": "organism",
-                        "term": "OBI:0100026"
-                    },
-                    "project": {
-                        "value": "FAANG"
-                    }
+                "sample_description": {
+                    "value": "Foal"
+                },
+                "material": {
+                    "text": "organism",
+                    "term": "OBI:0100026"
+                },
+                "project": {
+                    "value": "FAANG"
                 },
                 "organism": {
                     "text": "Equus caballus",
